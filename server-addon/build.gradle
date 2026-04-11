@@ -43,7 +43,9 @@ tasks.register('buildDatapack', Zip) {
     archiveBaseName = 'f1sch-server-addon-datapack'
     archiveVersion = project.version
     archiveExtension = 'zip'
-    destinationDirectory = file("${buildDir}/libs")
+    destinationDirectory = layout.buildDirectory.dir("libs")
 }
 
-build.dependsOn buildDatapack
+tasks.named('build') {
+    dependsOn tasks.named('buildDatapack')
+}
