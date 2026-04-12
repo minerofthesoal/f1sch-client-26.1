@@ -130,7 +130,7 @@ public class OspServerAddon implements DedicatedServerModInitializer {
     private void handleFly(ServerPlayer player, PlayerFeatureState state, boolean enabled, float speed) {
         state.flyEnabled = enabled; state.flySpeed = speed;
         if (!player.isCreative() && !player.isSpectator()) {
-            player.getAbilities().canFly = enabled;
+            player.getAbilities().mayfly = enabled;
             if (enabled) player.getAbilities().setFlyingSpeed(0.05f * speed);
             else { player.getAbilities().flying = false; player.getAbilities().setFlyingSpeed(0.05f); }
             player.onUpdateAbilities();
@@ -151,7 +151,7 @@ public class OspServerAddon implements DedicatedServerModInitializer {
             if (state == null) continue;
             if (state.noFallEnabled) player.fallDistance = 0.0f;
             if (state.flyEnabled && !player.isCreative() && !player.isSpectator()) {
-                if (!player.getAbilities().canFly) { player.getAbilities().canFly = true; player.getAbilities().setFlyingSpeed(0.05f * state.flySpeed); player.onUpdateAbilities(); }
+                if (!player.getAbilities().mayfly) { player.getAbilities().mayfly = true; player.getAbilities().setFlyingSpeed(0.05f * state.flySpeed); player.onUpdateAbilities(); }
                 if (player.getAbilities().flying) player.fallDistance = 0.0f;
             }
             if (state.espEnabled && tickCounter % 10 == 0) sendEspData(player, state.espRange);
@@ -159,7 +159,7 @@ public class OspServerAddon implements DedicatedServerModInitializer {
     }
 
     private void sendEspData(ServerPlayer player, float range) {
-        ServerLevel world = player.getServerLevel();
+        ServerLevel world = (ServerLevel) player.level();
         Vec3 pos = player.position();
         double r = Math.min(range, 500);
         AABB searchBox = new AABB(pos.x - r, pos.y - r, pos.z - r, pos.x + r, pos.y + r, pos.z + r);
@@ -182,11 +182,11 @@ public class OspServerAddon implements DedicatedServerModInitializer {
         AttributeInstance er = player.getAttribute(Attributes.ENTITY_INTERACTION_RANGE); if (er != null) er.removeModifier(ENTITY_REACH_ID);
         AttributeInstance sp = player.getAttribute(Attributes.MOVEMENT_SPEED); if (sp != null) sp.removeModifier(SPEED_ID);
         if (!player.isCreative() && !player.isSpectator()) {
-            player.getAbilities().canFly = false; player.getAbilities().flying = false; player.getAbilities().setFlyingSpeed(0.05f); player.onUpdateAbilities();
+            player.getAbilities().mayfly = false; player.getAbilities().flying = false; player.getAbilities().setFlyingSpeed(0.05f); player.onUpdateAbilities();
         }
     }
 
-    private void applyModifier(AttributeInstance attr, ResourceLocation id, double value) {
+    private void applyModifier(AttributeInstance attr, Identifier id, double value) {
         AttributeModifier existing = attr.getModifier(id);
         if (existing == null || existing.amount() != value) { attr.removeModifier(id); attr.addTransientModifier(new AttributeModifier(id, value, AttributeModifier.Operation.ADD_VALUE)); }
     }
