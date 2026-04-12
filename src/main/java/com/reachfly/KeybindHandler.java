@@ -9,7 +9,7 @@ import org.lwjgl.glfw.GLFW;
 public class KeybindHandler {
 
     private static final KeyMapping.Category CATEGORY =
-            KeyMapping.Category.create(ResourceLocation.fromNamespaceAndPath("reachfly", "category"));
+            KeyMapping.Category.create(ResourceLocation.of("reachfly", "category"));
 
     public static KeyMapping toggleReach, toggleFly, toggleEsp, toggleAutoHit;
     public static KeyMapping toggleLowHealthKill, toggleEatingAssist, toggleAutoKillWhenLow;

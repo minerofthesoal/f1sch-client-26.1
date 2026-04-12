@@ -28,10 +28,10 @@ public class OspServerAddon implements DedicatedServerModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("f1sch-server-addon");
 
-    private static final ResourceLocation KNOCKBACK_ID = ResourceLocation.fromNamespaceAndPath("reachfly", "knockback_boost");
-    private static final ResourceLocation BLOCK_REACH_ID = ResourceLocation.fromNamespaceAndPath("reachfly", "block_reach");
-    private static final ResourceLocation ENTITY_REACH_ID = ResourceLocation.fromNamespaceAndPath("reachfly", "entity_reach");
-    private static final ResourceLocation SPEED_ID = ResourceLocation.fromNamespaceAndPath("reachfly", "speed_boost");
+    private static final ResourceLocation KNOCKBACK_ID = ResourceLocation.of("reachfly", "knockback_boost");
+    private static final ResourceLocation BLOCK_REACH_ID = ResourceLocation.of("reachfly", "block_reach");
+    private static final ResourceLocation ENTITY_REACH_ID = ResourceLocation.of("reachfly", "entity_reach");
+    private static final ResourceLocation SPEED_ID = ResourceLocation.of("reachfly", "speed_boost");
 
     private static final double DEFAULT_BLOCK_RANGE = 4.5;
     private static final double DEFAULT_ENTITY_RANGE = 3.0;
@@ -42,10 +42,10 @@ public class OspServerAddon implements DedicatedServerModInitializer {
     public void onInitializeServer() {
         LOGGER.info("[f1sch Server Addon v3] Initializing for MC 26.1...");
 
-        PayloadTypeRegistry.playC2S().register(TeleportPayload.ID, TeleportPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(FeatureSyncPayload.ID, FeatureSyncPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(ItemGivePayload.ID, ItemGivePayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(EspDataPayload.ID, EspDataPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(TeleportPayload.ID, TeleportPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(FeatureSyncPayload.ID, FeatureSyncPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(ItemGivePayload.ID, ItemGivePayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(EspDataPayload.ID, EspDataPayload.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(TeleportPayload.ID, (payload, context) -> {
             ServerPlayer player = context.player();
@@ -104,7 +104,7 @@ public class OspServerAddon implements DedicatedServerModInitializer {
         state.knockbackEnabled = enabled; state.knockbackStrength = strength;
         AttributeInstance attr = player.getAttribute(Attributes.ATTACK_KNOCKBACK);
         if (attr == null) return;
-        if (enabled) { attr.removeModifier(KNOCKBACK_ID); attr.addTemporaryModifier(new AttributeModifier(KNOCKBACK_ID, strength, AttributeModifier.Operation.ADD_VALUE)); }
+        if (enabled) { attr.removeModifier(KNOCKBACK_ID); attr.addTransientModifier(new AttributeModifier(KNOCKBACK_ID, strength, AttributeModifier.Operation.ADD_VALUE)); }
         else attr.removeModifier(KNOCKBACK_ID);
     }
 
@@ -130,7 +130,7 @@ public class OspServerAddon implements DedicatedServerModInitializer {
     private void handleFly(ServerPlayer player, PlayerFeatureState state, boolean enabled, float speed) {
         state.flyEnabled = enabled; state.flySpeed = speed;
         if (!player.isCreative() && !player.isSpectator()) {
-            player.getAbilities().mayFly = enabled;
+            player.getAbilities().canFly = enabled;
             if (enabled) player.getAbilities().setFlyingSpeed(0.05f * speed);
             else { player.getAbilities().flying = false; player.getAbilities().setFlyingSpeed(0.05f); }
             player.onUpdateAbilities();
@@ -151,7 +151,7 @@ public class OspServerAddon implements DedicatedServerModInitializer {
             if (state == null) continue;
             if (state.noFallEnabled) player.fallDistance = 0.0f;
             if (state.flyEnabled && !player.isCreative() && !player.isSpectator()) {
-                if (!player.getAbilities().mayFly) { player.getAbilities().mayFly = true; player.getAbilities().setFlyingSpeed(0.05f * state.flySpeed); player.onUpdateAbilities(); }
+                if (!player.getAbilities().canFly) { player.getAbilities().canFly = true; player.getAbilities().setFlyingSpeed(0.05f * state.flySpeed); player.onUpdateAbilities(); }
                 if (player.getAbilities().flying) player.fallDistance = 0.0f;
             }
             if (state.espEnabled && tickCounter % 10 == 0) sendEspData(player, state.espRange);
@@ -159,7 +159,7 @@ public class OspServerAddon implements DedicatedServerModInitializer {
     }
 
     private void sendEspData(ServerPlayer player, float range) {
-        ServerLevel world = player.serverLevel();
+        ServerLevel world = player.getServerLevel();
         Vec3 pos = player.position();
         double r = Math.min(range, 500);
         AABB searchBox = new AABB(pos.x - r, pos.y - r, pos.z - r, pos.x + r, pos.y + r, pos.z + r);
@@ -182,13 +182,13 @@ public class OspServerAddon implements DedicatedServerModInitializer {
         AttributeInstance er = player.getAttribute(Attributes.ENTITY_INTERACTION_RANGE); if (er != null) er.removeModifier(ENTITY_REACH_ID);
         AttributeInstance sp = player.getAttribute(Attributes.MOVEMENT_SPEED); if (sp != null) sp.removeModifier(SPEED_ID);
         if (!player.isCreative() && !player.isSpectator()) {
-            player.getAbilities().mayFly = false; player.getAbilities().flying = false; player.getAbilities().setFlyingSpeed(0.05f); player.onUpdateAbilities();
+            player.getAbilities().canFly = false; player.getAbilities().flying = false; player.getAbilities().setFlyingSpeed(0.05f); player.onUpdateAbilities();
         }
     }
 
     private void applyModifier(AttributeInstance attr, ResourceLocation id, double value) {
         AttributeModifier existing = attr.getModifier(id);
-        if (existing == null || existing.value() != value) { attr.removeModifier(id); attr.addTemporaryModifier(new AttributeModifier(id, value, AttributeModifier.Operation.ADD_VALUE)); }
+        if (existing == null || existing.amount() != value) { attr.removeModifier(id); attr.addTransientModifier(new AttributeModifier(id, value, AttributeModifier.Operation.ADD_VALUE)); }
     }
 
     private static class PlayerFeatureState {

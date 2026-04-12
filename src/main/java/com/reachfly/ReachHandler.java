@@ -11,8 +11,8 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ReachHandler {
 
-    private static final ResourceLocation BLOCK_REACH_ID = ResourceLocation.fromNamespaceAndPath("reachfly", "block_reach");
-    private static final ResourceLocation ENTITY_REACH_ID = ResourceLocation.fromNamespaceAndPath("reachfly", "entity_reach");
+    private static final ResourceLocation BLOCK_REACH_ID = ResourceLocation.of("reachfly", "block_reach");
+    private static final ResourceLocation ENTITY_REACH_ID = ResourceLocation.of("reachfly", "entity_reach");
     private static final double DEFAULT_BLOCK_RANGE = 4.5;
     private static final double DEFAULT_ENTITY_RANGE = 3.0;
     private static int tickCounter = 0;
@@ -54,9 +54,9 @@ public class ReachHandler {
 
     private static void applyMod(AttributeInstance attr, ResourceLocation id, double value) {
         AttributeModifier existing = attr.getModifier(id);
-        if (existing == null || existing.value() != value) {
+        if (existing == null || existing.amount() != value) {
             attr.removeModifier(id);
-            attr.addTemporaryModifier(new AttributeModifier(id, value, AttributeModifier.Operation.ADD_VALUE));
+            attr.addTransientModifier(new AttributeModifier(id, value, AttributeModifier.Operation.ADD_VALUE));
         }
     }
 

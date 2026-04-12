@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class KnockbackHandler {
 
-    private static final ResourceLocation KNOCKBACK_ID = ResourceLocation.fromNamespaceAndPath("reachfly", "knockback_boost");
+    private static final ResourceLocation KNOCKBACK_ID = ResourceLocation.of("reachfly", "knockback_boost");
     private static int tickCounter = 0;
     private static boolean lastEnabled = false;
     private static float lastStrength = 0;
@@ -40,9 +40,9 @@ public class KnockbackHandler {
         if (ModConfig.knockbackEnabled) {
             double boost = ModConfig.knockbackStrength;
             AttributeModifier existing = kb.getModifier(KNOCKBACK_ID);
-            if (existing == null || existing.value() != boost) {
+            if (existing == null || existing.amount() != boost) {
                 kb.removeModifier(KNOCKBACK_ID);
-                kb.addTemporaryModifier(new AttributeModifier(KNOCKBACK_ID, boost, AttributeModifier.Operation.ADD_VALUE));
+                kb.addTransientModifier(new AttributeModifier(KNOCKBACK_ID, boost, AttributeModifier.Operation.ADD_VALUE));
             }
         } else { kb.removeModifier(KNOCKBACK_ID); }
     }

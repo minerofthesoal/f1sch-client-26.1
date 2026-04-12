@@ -9,7 +9,7 @@ public class EventHandler {
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(EventHandler::onClientTick);
-        HudElementRegistry.addLast(ResourceLocation.fromNamespaceAndPath("reachfly", "hud_overlay"), HudOverlay::render);
+        HudElementRegistry.addLast(ResourceLocation.of("reachfly", "hud_overlay"), HudOverlay::render);
         EspRenderer.register();
     }
 
@@ -21,7 +21,7 @@ public class EventHandler {
         while (KeybindHandler.toggleFly.consumeClick()) {
             ModConfig.flyEnabled = !ModConfig.flyEnabled; ModConfig.save();
             if (!client.player.getAbilities().instabuild) {
-                client.player.getAbilities().mayFly = ModConfig.flyEnabled;
+                client.player.getAbilities().canFly = ModConfig.flyEnabled;
                 if (!ModConfig.flyEnabled) client.player.getAbilities().flying = false;
                 client.player.onUpdateAbilities();
             }

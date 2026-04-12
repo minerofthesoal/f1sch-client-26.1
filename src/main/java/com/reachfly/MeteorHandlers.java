@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class MeteorHandlers {
 
-    private static final ResourceLocation STEP_ID = ResourceLocation.fromNamespaceAndPath("reachfly", "step_height");
+    private static final ResourceLocation STEP_ID = ResourceLocation.of("reachfly", "step_height");
 
     public static void tick(Minecraft client) {
         if (client.player == null) return;
@@ -50,7 +50,7 @@ public class MeteorHandlers {
         if (stepAttr == null) return;
         if (ModConfig.stepEnabled && !stepApplied) {
             stepAttr.removeModifier(STEP_ID);
-            stepAttr.addTemporaryModifier(new AttributeModifier(STEP_ID, ModConfig.stepHeight - 0.6, AttributeModifier.Operation.ADD_VALUE));
+            stepAttr.addTransientModifier(new AttributeModifier(STEP_ID, ModConfig.stepHeight - 0.6, AttributeModifier.Operation.ADD_VALUE));
             stepApplied = true;
         } else if (!ModConfig.stepEnabled && stepApplied) {
             stepAttr.removeModifier(STEP_ID);

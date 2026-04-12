@@ -21,7 +21,7 @@ import org.joml.Vector4f;
 public class EspRenderer {
 
     private static final ResourceLocation ESP_HUD_ID =
-            ResourceLocation.fromNamespaceAndPath("reachfly", "esp_renderer");
+            ResourceLocation.of("reachfly", "esp_renderer");
 
     public static void register() {
         HudElementRegistry.addLast(ESP_HUD_ID, EspRenderer::renderEsp);

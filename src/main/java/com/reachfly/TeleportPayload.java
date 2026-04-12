@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 public record TeleportPayload(double x, double y, double z) implements CustomPacketPayload {
 
     public static final Type<TeleportPayload> ID =
-            new Type<>(ResourceLocation.fromNamespaceAndPath("reachfly", "teleport"));
+            new Type<>(ResourceLocation.of("reachfly", "teleport"));
 
     public static final StreamCodec<FriendlyByteBuf, TeleportPayload> CODEC =
             StreamCodec.of(TeleportPayload::write, TeleportPayload::read);
@@ -19,5 +19,5 @@ public record TeleportPayload(double x, double y, double z) implements CustomPac
         return new TeleportPayload(buf.readDouble(), buf.readDouble(), buf.readDouble());
     }
 
-    @Override public Type<? extends CustomPacketPayload> getId() { return ID; }
+    @Override public Type<? extends CustomPacketPayload> type() { return ID; }
 }

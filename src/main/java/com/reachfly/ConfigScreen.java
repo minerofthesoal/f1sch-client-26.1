@@ -59,7 +59,7 @@ public class ConfigScreen extends Screen {
         optionList.addToggle("Fly", () -> ModConfig.flyEnabled, v -> {
             ModConfig.flyEnabled = v;
             if (minecraft.player != null && !minecraft.player.getAbilities().instabuild) {
-                minecraft.player.getAbilities().mayFly = v;
+                minecraft.player.getAbilities().canFly = v;
                 if (!v) minecraft.player.getAbilities().flying = false;
                 minecraft.player.onUpdateAbilities();
             }

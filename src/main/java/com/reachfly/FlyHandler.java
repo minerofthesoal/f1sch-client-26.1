@@ -14,7 +14,7 @@ public class FlyHandler {
 
         if (ModConfig.flyEnabled) {
             wasFlying = true;
-            player.getAbilities().mayFly = true;
+            player.getAbilities().canFly = true;
             player.getAbilities().setFlyingSpeed(0.05f * ModConfig.flySpeed);
             if (player.getAbilities().flying) player.fallDistance = 0.0f;
         } else {
@@ -26,7 +26,7 @@ public class FlyHandler {
                             : "\u00a7c[f1sch] \u00a7eFly disabled! You are falling!";
                     player.displayClientMessage(net.minecraft.network.chat.Component.literal(msg), true);
                 }
-                player.getAbilities().mayFly = false;
+                player.getAbilities().canFly = false;
                 player.getAbilities().flying = false;
             }
         }
