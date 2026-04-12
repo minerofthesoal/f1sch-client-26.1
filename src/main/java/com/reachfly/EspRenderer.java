@@ -7,7 +7,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
@@ -20,8 +20,8 @@ import org.joml.Vector4f;
 
 public class EspRenderer {
 
-    private static final ResourceLocation ESP_HUD_ID =
-            ResourceLocation.of("reachfly", "esp_renderer");
+    private static final Identifier ESP_HUD_ID =
+            Identifier.fromNamespaceAndPath("reachfly", "esp_renderer");
 
     public static void register() {
         HudElementRegistry.addLast(ESP_HUD_ID, EspRenderer::renderEsp);

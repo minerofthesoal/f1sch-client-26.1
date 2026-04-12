@@ -7,12 +7,12 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ReachHandler {
 
-    private static final ResourceLocation BLOCK_REACH_ID = ResourceLocation.of("reachfly", "block_reach");
-    private static final ResourceLocation ENTITY_REACH_ID = ResourceLocation.of("reachfly", "entity_reach");
+    private static final Identifier BLOCK_REACH_ID = Identifier.fromNamespaceAndPath("reachfly", "block_reach");
+    private static final Identifier ENTITY_REACH_ID = Identifier.fromNamespaceAndPath("reachfly", "entity_reach");
     private static final double DEFAULT_BLOCK_RANGE = 4.5;
     private static final double DEFAULT_ENTITY_RANGE = 3.0;
     private static int tickCounter = 0;
@@ -52,7 +52,7 @@ public class ReachHandler {
         }
     }
 
-    private static void applyMod(AttributeInstance attr, ResourceLocation id, double value) {
+    private static void applyMod(AttributeInstance attr, Identifier id, double value) {
         AttributeModifier existing = attr.getModifier(id);
         if (existing == null || existing.amount() != value) {
             attr.removeModifier(id);

@@ -1,22 +1,22 @@
 package com.reachfly;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record ItemGivePayload(String itemId, int quantity) implements CustomPacketPayload {
 
     public static final Type<ItemGivePayload> ID =
-            new Type<>(ResourceLocation.of("reachfly", "item_give"));
+            new Type<>(Identifier.fromNamespaceAndPath("reachfly", "item_give"));
 
-    public static final StreamCodec<FriendlyByteBuf, ItemGivePayload> CODEC =
+    public static final StreamCodec<RegistryFriendlyByteBuf, ItemGivePayload> CODEC =
             StreamCodec.of(ItemGivePayload::write, ItemGivePayload::read);
 
-    private void write(FriendlyByteBuf buf) { buf.writeUtf(itemId); buf.writeInt(quantity); }
+    private void write(RegistryFriendlyByteBuf buf) { buf.writeUtf(itemId); buf.writeInt(quantity); }
 
-    private static ItemGivePayload read(FriendlyByteBuf buf) {
-        return new ItemGivePayload(buf.readUtf(), buf.readInt());
+    private static ItemGivePayload read(RegistryFriendlyByteBuf buf) {
+        return new ItemGivePayload(buf.readUtf(32767), buf.readInt());
     }
 
     @Override public Type<? extends CustomPacketPayload> type() { return ID; }

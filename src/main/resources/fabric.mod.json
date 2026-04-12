@@ -14,7 +14,6 @@
     "modmenu": ["com.reachfly.ModMenuIntegration"]
   },
   "mixins": ["reachfly.mixins.json"],
-  "accessWidener": "reachfly.accesswidener",
   "depends": {
     "fabricloader": ">=0.19.0",
     "minecraft": ">=26.1",

@@ -3,13 +3,13 @@ package com.reachfly;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class EventHandler {
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(EventHandler::onClientTick);
-        HudElementRegistry.addLast(ResourceLocation.of("reachfly", "hud_overlay"), HudOverlay::render);
+        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("reachfly", "hud_overlay"), HudOverlay::render);
         EspRenderer.register();
     }
 
@@ -21,7 +21,7 @@ public class EventHandler {
         while (KeybindHandler.toggleFly.consumeClick()) {
             ModConfig.flyEnabled = !ModConfig.flyEnabled; ModConfig.save();
             if (!client.player.getAbilities().instabuild) {
-                client.player.getAbilities().canFly = ModConfig.flyEnabled;
+                client.player.getAbilities().mayfly = ModConfig.flyEnabled;
                 if (!ModConfig.flyEnabled) client.player.getAbilities().flying = false;
                 client.player.onUpdateAbilities();
             }

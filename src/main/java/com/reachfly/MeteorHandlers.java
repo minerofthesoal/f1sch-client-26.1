@@ -6,11 +6,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class MeteorHandlers {
 
-    private static final ResourceLocation STEP_ID = ResourceLocation.of("reachfly", "step_height");
+    private static final Identifier STEP_ID = Identifier.fromNamespaceAndPath("reachfly", "step_height");
 
     public static void tick(Minecraft client) {
         if (client.player == null) return;

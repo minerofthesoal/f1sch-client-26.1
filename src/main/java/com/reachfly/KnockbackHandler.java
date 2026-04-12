@@ -7,11 +7,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class KnockbackHandler {
 
-    private static final ResourceLocation KNOCKBACK_ID = ResourceLocation.of("reachfly", "knockback_boost");
+    private static final Identifier KNOCKBACK_ID = Identifier.fromNamespaceAndPath("reachfly", "knockback_boost");
     private static int tickCounter = 0;
     private static boolean lastEnabled = false;
     private static float lastStrength = 0;

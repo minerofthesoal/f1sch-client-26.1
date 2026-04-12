@@ -19,14 +19,14 @@ public class FreecamHandler {
         if (ModConfig.freecamEnabled && !active) {
             active = true; savedX = p.getX(); savedY = p.getY(); savedZ = p.getZ();
             savedYaw = p.getYRot(); savedPitch = p.getXRot(); wasFlying = p.getAbilities().flying;
-            p.noPhysics = true; p.getAbilities().canFly = true; p.getAbilities().flying = true;
+            p.noPhysics = true; p.getAbilities().mayfly = true; p.getAbilities().flying = true;
             p.getAbilities().setFlyingSpeed(0.1f); p.onUpdateAbilities();
             p.displayClientMessage(net.minecraft.network.chat.Component.literal("\u00a7b[Freecam] Enabled"), true);
         } else if (!ModConfig.freecamEnabled && active) {
             active = false; p.setPosition(savedX, savedY, savedZ);
             p.setYRot(savedYaw); p.setXRot(savedPitch); p.noPhysics = false; p.fallDistance = 0;
             if (!p.isCreative() && !p.isSpectator()) {
-                p.getAbilities().canFly = ModConfig.flyEnabled;
+                p.getAbilities().mayfly = ModConfig.flyEnabled;
                 p.getAbilities().flying = wasFlying && ModConfig.flyEnabled;
                 p.getAbilities().setFlyingSpeed(ModConfig.flyEnabled ? 0.05f * ModConfig.flySpeed : 0.05f);
                 p.onUpdateAbilities();

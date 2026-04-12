@@ -17,7 +17,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
@@ -28,10 +28,10 @@ public class OspServerAddon implements DedicatedServerModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("f1sch-server-addon");
 
-    private static final ResourceLocation KNOCKBACK_ID = ResourceLocation.of("reachfly", "knockback_boost");
-    private static final ResourceLocation BLOCK_REACH_ID = ResourceLocation.of("reachfly", "block_reach");
-    private static final ResourceLocation ENTITY_REACH_ID = ResourceLocation.of("reachfly", "entity_reach");
-    private static final ResourceLocation SPEED_ID = ResourceLocation.of("reachfly", "speed_boost");
+    private static final Identifier KNOCKBACK_ID = Identifier.fromNamespaceAndPath("reachfly", "knockback_boost");
+    private static final Identifier BLOCK_REACH_ID = Identifier.fromNamespaceAndPath("reachfly", "block_reach");
+    private static final Identifier ENTITY_REACH_ID = Identifier.fromNamespaceAndPath("reachfly", "entity_reach");
+    private static final Identifier SPEED_ID = Identifier.fromNamespaceAndPath("reachfly", "speed_boost");
 
     private static final double DEFAULT_BLOCK_RANGE = 4.5;
     private static final double DEFAULT_ENTITY_RANGE = 3.0;

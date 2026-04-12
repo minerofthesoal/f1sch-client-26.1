@@ -34,7 +34,7 @@ public class FlyToCoordsHandler {
             ModConfig.flyToCoordsEnabled = false; isNavigating = false; player.setDeltaMovement(Vec3.ZERO);
             player.displayClientMessage(Component.literal("\u00a7b[f1sch] \u00a7aArrived at destination!"), true); ModConfig.save(); return;
         }
-        if (!player.getAbilities().instabuild) { player.getAbilities().canFly = true; player.getAbilities().flying = true; player.fallDistance = 0.0f; }
+        if (!player.getAbilities().instabuild) { player.getAbilities().mayfly = true; player.getAbilities().flying = true; player.fallDistance = 0.0f; }
         if (lastPos != null) { double movedDist = pos.distanceTo(lastPos); if (movedDist < 0.5) stuckTicks++; else stuckTicks = 0; }
         tickCounter++;
         if (tickCounter >= 20) {
