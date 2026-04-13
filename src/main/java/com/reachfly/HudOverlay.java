@@ -3,7 +3,7 @@ package com.reachfly;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 
@@ -19,7 +19,7 @@ public class HudOverlay {
     private static final int BAR_COLOR_START = 0xFF00AAFF;
     private static final int BAR_COLOR_END = 0xFFFF55FF;
 
-    public static void render(DrawContext ctx, DeltaTracker tickCounter) {
+    public static void render(GuiGraphicsExtractor ctx, DeltaTracker tickCounter) {
         Minecraft client = Minecraft.getInstance();
         if (!ModConfig.hudVisible || client.player == null || client.options.hideGui) return;
 

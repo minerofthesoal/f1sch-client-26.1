@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
@@ -27,7 +27,7 @@ public class EspRenderer {
         HudElementRegistry.addLast(ESP_HUD_ID, EspRenderer::renderEsp);
     }
 
-    public static void renderEsp(DrawContext ctx, DeltaTracker tickCounter) {
+    public static void renderEsp(GuiGraphicsExtractor ctx, DeltaTracker tickCounter) {
         Minecraft client = Minecraft.getInstance();
         if (!ModConfig.espEnabled || client.player == null || client.level == null) return;
         if (client.options.hideGui) return;
@@ -45,12 +45,12 @@ public class EspRenderer {
         Matrix4f projMatrix = client.gameRenderer.getProjectionMatrix(client.options.fov().get().floatValue());
         Matrix4f viewMatrix = new Matrix4f();
         viewMatrix.identity();
-        viewMatrix.rotate(Axis.XP.rotationDegrees(camera.getXRot()));
-        viewMatrix.rotate(Axis.YP.rotationDegrees(camera.getYRot() + 180.0f));
+        viewMatrix.rotate(Axis.XP.rotationDegrees(camera.xRot()));
+        viewMatrix.rotate(Axis.YP.rotationDegrees(camera.yRot() + 180.0f));
 
         Matrix4f mvpMatrix = new Matrix4f(projMatrix).mul(viewMatrix);
 
-        Vec3 cameraPos = camera.getPosition();
+        Vec3 cameraPos = camera.position();
 
         for (Entity entity : client.level.entitiesForRendering()) {
             if (entity == p) continue;
@@ -139,7 +139,7 @@ public class EspRenderer {
         return new int[]{sx, sy};
     }
 
-    private static void drawLine(DrawContext ctx, int x1, int y1, int x2, int y2, int color) {
+    private static void drawLine(GuiGraphicsExtractor ctx, int x1, int y1, int x2, int y2, int color) {
         // Bresenham line drawing using fill rectangles
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
@@ -170,7 +170,7 @@ public class EspRenderer {
         }
     }
 
-    private static void drawPathTrace(DrawContext ctx, Matrix4f mvp, Vec3 cameraPos,
+    private static void drawPathTrace(GuiGraphicsExtractor ctx, Matrix4f mvp, Vec3 cameraPos,
                                        LocalPlayer player, double ex, double ey, double ez,
                                        int screenWidth, int screenHeight, int color) {
         Vec3 start = player.position();

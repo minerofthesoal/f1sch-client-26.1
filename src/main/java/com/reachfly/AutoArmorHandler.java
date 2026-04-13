@@ -36,7 +36,7 @@ public class AutoArmorHandler {
                 }
             }
             if (bestInvSlot >= 0) {
-                client.gameMode.handleInventoryMouseClick(player.containerMenu.containerId, bestInvSlot, 0, ContainerInput.QUICK_MOVE, player);
+                client.gameMode.handleInventoryMouseClick(player.containerMenu.containerId, bestInvSlot, 0, ContainerInput.QUICK_MOVE.id(), player);
                 return;
             }
         }

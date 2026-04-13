@@ -174,7 +174,7 @@ public class MeteorV2Handlers {
         anchorAuraCooldown = 5;
 
         // Only works in non-nether dimensions
-        if (client.level.dimensionType().respawnAnchorWorks()) return;
+        if (client.level.dimension() == net.minecraft.world.level.Level.NETHER) return; // anchors only explode outside nether
 
         Player target = findNearestEnemy(client, p, 5.0);
         if (target == null) return;

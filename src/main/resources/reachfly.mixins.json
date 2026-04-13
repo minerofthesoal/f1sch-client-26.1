@@ -9,8 +9,7 @@
     "ClientPlayerInteractionManagerMixin",
     "EntityGlowMixin",
     "InvMoveMixin",
-    "SafeWalkMixin",
-    "XrayBlockRenderMixin"
+    "SafeWalkMixin"
   ],
   "injectors": {"defaultRequire": 1}
 }

@@ -16,7 +16,7 @@ public class NoFallHandler {
         if (!player.onGround()) {
             client.getConnection().send(new ServerboundMovePlayerPacket.PosRot(
                     player.getX(), player.getY(), player.getZ(),
-                    player.getYRot(), player.getXRot(), true, player.horizontalCollision, false));
+                    player.getYRot(), player.getXRot(), true, player.horizontalCollision));
         }
         MinecraftServer server = client.getSingleplayerServer();
         if (server != null) {

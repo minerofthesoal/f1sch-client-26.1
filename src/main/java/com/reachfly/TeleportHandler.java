@@ -35,7 +35,7 @@ public class TeleportHandler {
             ServerPlayer sp = server.getPlayerList().getPlayer(player.getUUID());
             if (sp != null) {
                 sp.teleportTo(tx, ty, tz);
-                player.sendOverlayMessage(Component.literal("\u00a7a[TP] Teleported to " + String.format("%.0f, %.0f, %.0f", tx, ty, tz)), true);
+                player.sendOverlayMessage(Component.literal("\u00a7a[TP] Teleported to " + String.format("%.0f, %.0f, %.0f", tx, ty, tz)));
                 return;
             }
         }
@@ -46,7 +46,7 @@ public class TeleportHandler {
     private static void normalTeleport(Minecraft client, LocalPlayer player, double tx, double ty, double tz) {
         if (ClientPlayNetworking.canSend(TeleportPayload.ID)) {
             ClientPlayNetworking.send(new TeleportPayload(tx, ty, tz));
-            player.sendOverlayMessage(Component.literal("\u00a7a[TP] Teleported via server addon: " + String.format("%.0f, %.0f, %.0f", tx, ty, tz)), true);
+            player.sendOverlayMessage(Component.literal("\u00a7a[TP] Teleported via server addon: " + String.format("%.0f, %.0f, %.0f", tx, ty, tz)));
             return;
         }
         if (client.getConnection() != null) {
@@ -54,7 +54,7 @@ public class TeleportHandler {
             client.getConnection().sendCommand("trigger f1sch.tp_y set " + (int) ty);
             client.getConnection().sendCommand("trigger f1sch.tp_z set " + (int) tz);
             client.getConnection().sendCommand("trigger f1sch.tp set 1");
-            player.sendOverlayMessage(Component.literal("\u00a7a[TP] Teleporting to " + String.format("%.0f, %.0f, %.0f", tx, ty, tz)), true);
+            player.sendOverlayMessage(Component.literal("\u00a7a[TP] Teleporting to " + String.format("%.0f, %.0f, %.0f", tx, ty, tz)));
         }
     }
 
@@ -64,7 +64,7 @@ public class TeleportHandler {
         for (int i = 0; i < 5; i++) {
             client.getConnection().send(new ServerboundMovePlayerPacket.PosRot(tx, ty, tz, player.getYRot(), player.getXRot(), true, false));
         }
-        player.sendOverlayMessage(Component.literal("\u00a7a[TP BETA] Teleported to " + String.format("%.0f, %.0f, %.0f", tx, ty, tz)), true);
+        player.sendOverlayMessage(Component.literal("\u00a7a[TP BETA] Teleported to " + String.format("%.0f, %.0f, %.0f", tx, ty, tz)));
     }
 
     public static void registerPayload() {

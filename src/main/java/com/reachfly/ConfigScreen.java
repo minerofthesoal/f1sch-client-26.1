@@ -293,12 +293,12 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void extractContent(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             ctx.drawString(Minecraft.getInstance().font, label, x, y + 6, 0xFFFFFF);
             button.setY(y);
             button.setX(x + entryWidth - 104);
-            button.render(ctx, mouseX, mouseY, delta);
+            button.extractContent(ctx, mouseX, mouseY, delta);
         }
 
         @Override public List<? extends GuiEventListener> children() { return List.of(button); }
@@ -328,12 +328,12 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void extractContent(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             ctx.drawString(Minecraft.getInstance().font, label, x, y + 6, 0xFFFFFF);
             slider.setY(y);
             slider.setX(x + entryWidth - 154);
-            slider.render(ctx, mouseX, mouseY, delta);
+            slider.extractContent(ctx, mouseX, mouseY, delta);
         }
 
         @Override public List<? extends GuiEventListener> children() { return List.of(slider); }
@@ -363,12 +363,12 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void extractContent(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             ctx.drawString(Minecraft.getInstance().font, label, x, y + 6, 0xFFFFFF);
             slider.setY(y);
             slider.setX(x + entryWidth - 154);
-            slider.render(ctx, mouseX, mouseY, delta);
+            slider.extractContent(ctx, mouseX, mouseY, delta);
         }
 
         @Override public List<? extends GuiEventListener> children() { return List.of(slider); }
@@ -389,12 +389,12 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void extractContent(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             ctx.drawString(Minecraft.getInstance().font, label, x, y + 6, 0xFFFFFF);
             editBox.setY(y);
             editBox.setX(x + entryWidth - 154);
-            editBox.render(ctx, mouseX, mouseY, delta);
+            editBox.extractContent(ctx, mouseX, mouseY, delta);
         }
 
         @Override public List<? extends GuiEventListener> children() { return List.of(editBox); }
@@ -426,16 +426,16 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void extractContent(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             ctx.drawString(Minecraft.getInstance().font, prefix + " X/Y/Z:", x, y + 6, 0xFFFFFF);
             int startX = x + entryWidth - 154;
             xBox.setX(startX); xBox.setY(y);
             yBox.setX(startX + 50); yBox.setY(y);
             zBox.setX(startX + 100); zBox.setY(y);
-            xBox.render(ctx, mouseX, mouseY, delta);
-            yBox.render(ctx, mouseX, mouseY, delta);
-            zBox.render(ctx, mouseX, mouseY, delta);
+            xBox.extractContent(ctx, mouseX, mouseY, delta);
+            yBox.extractContent(ctx, mouseX, mouseY, delta);
+            zBox.extractContent(ctx, mouseX, mouseY, delta);
         }
 
         @Override public List<? extends GuiEventListener> children() { return List.of(xBox, yBox, zBox); }
@@ -467,15 +467,15 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void extractContent(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             String label = ModConfig.proUnlocked ? "Pro: Active" : "Enter Pro Code:";
             ctx.drawString(Minecraft.getInstance().font, label, x, y + 6, ModConfig.proUnlocked ? 0x55FF55 : 0xFFAA00);
             int startX = x + entryWidth - 200;
             codeBox.setX(startX); codeBox.setY(y);
             unlockButton.setX(startX + 124); unlockButton.setY(y);
-            codeBox.render(ctx, mouseX, mouseY, delta);
-            unlockButton.render(ctx, mouseX, mouseY, delta);
+            codeBox.extractContent(ctx, mouseX, mouseY, delta);
+            unlockButton.extractContent(ctx, mouseX, mouseY, delta);
         }
 
         @Override public List<? extends GuiEventListener> children() { return List.of(codeBox, unlockButton); }

@@ -111,7 +111,7 @@ public class ProHandlers {
         LocalPlayer p = client.player;
         for (int i = 0; i < extraTicks; i++) {
             Vec3 vel = p.getDeltaMovement(); p.setPos(p.getX() + vel.x, p.getY() + vel.y, p.getZ() + vel.z);
-            if (client.getConnection() != null) client.getConnection().send(new ServerboundMovePlayerPacket.PosRot(p.getX(), p.getY(), p.getZ(), p.getYRot(), p.getXRot(), p.onGround(), false, false));
+            if (client.getConnection() != null) client.getConnection().send(new ServerboundMovePlayerPacket.PosRot(p.getX(), p.getY(), p.getZ(), p.getYRot(), p.getXRot(), p.onGround(), false));
         }
     }
 
@@ -136,7 +136,7 @@ public class ProHandlers {
         int containerSlots = container.getRowCount() * 9;
         for (int i = 0; i < containerSlots; i++) {
             Slot slot = container.getSlot(i);
-            if (slot.hasItem()) { client.gameMode.handleInventoryMouseClick(container.containerId, i, 0, ContainerInput.QUICK_MOVE, client.player); return; }
+            if (slot.hasItem()) { client.gameMode.handleInventoryMouseClick(container.containerId, i, 0, ContainerInput.QUICK_MOVE.id(), client.player); return; }
         }
     }
 
