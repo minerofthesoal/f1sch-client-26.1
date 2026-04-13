@@ -34,7 +34,7 @@ public class JesusHandler {
         if (player.isUnderWater() || (player.isInLava() && player.getY() < targetY - 0.5)) {
             player.setDeltaMovement(player.getDeltaMovement().x, 0.3, player.getDeltaMovement().z);
         } else {
-            if (player.getY() < targetY) player.setPosition(player.getX(), targetY, player.getZ());
+            if (player.getY() < targetY) player.setPos(player.getX(), targetY, player.getZ());
             player.setDeltaMovement(player.getDeltaMovement().x, player.getDeltaMovement().y > 0 ? player.getDeltaMovement().y : 0.0, player.getDeltaMovement().z);
             player.setOnGround(true); player.fallDistance = 0.0f;
         }

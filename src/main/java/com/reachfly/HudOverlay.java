@@ -3,7 +3,7 @@ package com.reachfly;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 
@@ -19,7 +19,7 @@ public class HudOverlay {
     private static final int BAR_COLOR_START = 0xFF00AAFF;
     private static final int BAR_COLOR_END = 0xFFFF55FF;
 
-    public static void render(GuiGraphics ctx, DeltaTracker tickCounter) {
+    public static void render(DrawContext ctx, DeltaTracker tickCounter) {
         Minecraft client = Minecraft.getInstance();
         if (!ModConfig.hudVisible || client.player == null || client.options.hideGui) return;
 
@@ -34,7 +34,7 @@ public class HudOverlay {
 
         // --- Module array list top-right, sorted by text width, right-aligned with color bars ---
         List<String> activeModules = getActiveModules();
-        activeModules.sort(Comparator.comparingInt(font::width).reversed());
+        activeModules.sort(Comparator.comparingInt((String s) -> font.width(s)).reversed());
 
         int yOffset = 2;
         int moduleCount = activeModules.size();
@@ -58,7 +58,7 @@ public class HudOverlay {
         // --- Info bar bottom-left: coords, FPS, direction ---
         LocalPlayer p = client.player;
         String coords = String.format("XYZ: %.1f / %.1f / %.1f", p.getX(), p.getY(), p.getZ());
-        String fps = client.fpsString;
+        String fps = String.valueOf(client.getFps());
         String direction = getCardinalDirection(p.getYRot());
 
         int infoY = screenHeight - 12;

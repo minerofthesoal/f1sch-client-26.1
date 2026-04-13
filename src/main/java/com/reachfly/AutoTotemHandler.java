@@ -3,7 +3,7 @@ package com.reachfly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 
 public class AutoTotemHandler {
 
@@ -20,10 +20,10 @@ public class AutoTotemHandler {
         int syncId = player.containerMenu.containerId;
         for (int i = 9; i < 45; i++) {
             if (player.containerMenu.getSlot(i).getItem().is(Items.TOTEM_OF_UNDYING)) {
-                client.gameMode.handleInventoryMouseClick(syncId, i, 0, ClickType.PICKUP, player);
-                client.gameMode.handleInventoryMouseClick(syncId, 45, 0, ClickType.PICKUP, player);
+                client.gameMode.handleInventoryMouseClick(syncId, i, 0, ContainerInput.PICKUP, player);
+                client.gameMode.handleInventoryMouseClick(syncId, 45, 0, ContainerInput.PICKUP, player);
                 if (!player.containerMenu.getCarried().isEmpty()) {
-                    client.gameMode.handleInventoryMouseClick(syncId, i, 0, ClickType.PICKUP, player);
+                    client.gameMode.handleInventoryMouseClick(syncId, i, 0, ContainerInput.PICKUP, player);
                 }
                 return;
             }

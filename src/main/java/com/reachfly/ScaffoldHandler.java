@@ -22,14 +22,14 @@ public class ScaffoldHandler {
         BlockPos below = new BlockPos((int) Math.floor(player.getX()), (int) Math.floor(player.getY() - 1), (int) Math.floor(player.getZ()));
         BlockState belowState = client.level.getBlockState(below);
         if (!belowState.isAir() && !belowState.liquid()) return;
-        int origSlot = player.getInventory().selected;
+        int origSlot = player.getInventory().getSelectedSlot();
         int blockSlot = -1;
         for (int i = 0; i < 9; i++) { if (player.getInventory().getItem(i).getItem() instanceof BlockItem) { blockSlot = i; break; } }
         if (blockSlot < 0) return;
-        player.getInventory().selected = blockSlot;
+        player.getInventory().setSelectedSlot(blockSlot);
         Direction[] dirs = {Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.UP};
         for (Direction dir : dirs) {
-            BlockPos neighbor = below.offset(dir);
+            BlockPos neighbor = below.relative(dir);
             BlockState neighborState = client.level.getBlockState(neighbor);
             if (!neighborState.isAir() && !neighborState.liquid()) {
                 BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(neighbor), dir.getOpposite(), below, false);
@@ -37,6 +37,6 @@ public class ScaffoldHandler {
                 cooldown = 2; break;
             }
         }
-        player.getInventory().selected = origSlot;
+        player.getInventory().setSelectedSlot(origSlot);
     }
 }

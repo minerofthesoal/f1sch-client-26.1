@@ -62,7 +62,7 @@ public class WurstHandlers {
             return;
         }
         LocalPlayer p = client.player;
-        if (p == null || !p.isOnGround()) return;
+        if (p == null || !p.onGround()) return;
         if (p.getAttackStrengthScale(0.0f) >= 0.95f && !criticalJumped) {
             p.setDeltaMovement(p.getDeltaMovement().add(0, 0.1, 0));
             p.setOnGround(false);
@@ -74,7 +74,7 @@ public class WurstHandlers {
     private static void tickBunnyHop(Minecraft client) {
         if (!ModConfig.bunnyHopEnabled) return;
         LocalPlayer p = client.player;
-        if (p == null || client.screen != null || !p.isSprinting() || !p.isOnGround()) return;
+        if (p == null || client.screen != null || !p.isSprinting() || !p.onGround()) return;
         bunnyHopDelay++;
         if (bunnyHopDelay < 1) return;
         bunnyHopDelay = 0;
@@ -85,7 +85,7 @@ public class WurstHandlers {
         if (!ModConfig.spiderEnabled) return;
         LocalPlayer p = client.player;
         if (p == null) return;
-        if (p.horizontalCollision && !p.isOnGround()) {
+        if (p.horizontalCollision && !p.onGround()) {
             Vec3 vel = p.getDeltaMovement();
             p.setDeltaMovement(vel.x, 0.2, vel.z);
             p.fallDistance = 0.0f;
@@ -95,7 +95,7 @@ public class WurstHandlers {
     private static void tickGlide(Minecraft client) {
         if (!ModConfig.glideEnabled) return;
         LocalPlayer p = client.player;
-        if (p == null || p.isOnGround()) return;
+        if (p == null || p.onGround()) return;
         if (p.getDeltaMovement().y < 0) {
             Vec3 vel = p.getDeltaMovement();
             p.setDeltaMovement(vel.x, Math.max(vel.y, -0.06), vel.z);
@@ -108,7 +108,7 @@ public class WurstHandlers {
         LocalPlayer p = client.player;
         if (p == null) return;
         Vec3 vel = p.getDeltaMovement();
-        if (!p.isOnGround() && vel.y > 0.38 && vel.y < 0.45) {
+        if (!p.onGround() && vel.y > 0.38 && vel.y < 0.45) {
             double boost = (ModConfig.highJumpHeight - 1.0) * 0.2;
             p.setDeltaMovement(vel.x, vel.y + boost, vel.z);
         }
@@ -153,8 +153,8 @@ public class WurstHandlers {
                 bestSlot = i;
             }
         }
-        if (bestSlot >= 0 && bestSlot != p.getInventory().selected)
-            p.getInventory().selected = bestSlot;
+        if (bestSlot >= 0 && bestSlot != p.getInventory().getSelectedSlot())
+            p.getInventory().setSelectedSlot(bestSlot);
     }
 
     private static void tickSneak(Minecraft client) {
@@ -212,15 +212,15 @@ public class WurstHandlers {
         ModConfig.panicEnabled = false;
         ModConfig.save();
         if (client.player != null)
-            client.player.displayClientMessage(
-                    Component.literal("\u00a7c[f1sch] PANIC - All hacks disabled!"), true);
+            client.player.sendOverlayMessage(
+                    Component.literal("\u00a7c[f1sch] PANIC - All hacks disabled!"));
     }
 
     private static void tickAntiHunger(Minecraft client) {
         if (!ModConfig.antiHungerEnabled) return;
         LocalPlayer p = client.player;
         if (p == null || client.getConnection() == null) return;
-        if (!p.isOnGround() && p.getDeltaMovement().y < 0) {
+        if (!p.onGround() && p.getDeltaMovement().y < 0) {
             client.getConnection().send(
                     new ServerboundMovePlayerPacket.StatusOnly(true, p.horizontalCollision));
         }
@@ -254,7 +254,7 @@ public class WurstHandlers {
     private static void tickParkour(Minecraft client) {
         if (!ModConfig.parkourEnabled) return;
         LocalPlayer p = client.player;
-        if (p == null || client.screen != null || !p.isOnGround()) return;
+        if (p == null || client.screen != null || !p.onGround()) return;
         Vec3 vel = p.getDeltaMovement();
         double speed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
         if (speed < 0.05) return;
@@ -287,27 +287,27 @@ public class WurstHandlers {
     private static void tickAutoWalk(Minecraft client) {
         if (!ModConfig.autoWalkEnabled || client.player == null || client.screen != null) return;
         LocalPlayer p = client.player;
-        net.minecraft.world.entity.player.Input current = p.input.lastInput;
-        p.input.lastInput = new net.minecraft.world.entity.player.Input(
+        net.minecraft.world.entity.player.Input current = p.input.keyPresses;
+        p.input.keyPresses = new net.minecraft.world.entity.player.Input(
                 true, current.backward(), current.left(), current.right(),
-                current.jump(), current.sneak(), current.sprint());
+                current.jump(), current.shift(), current.sprint());
     }
 
     private static void tickAirJump(Minecraft client) {
         if (!ModConfig.airJumpEnabled || client.player == null || client.screen != null) return;
         LocalPlayer p = client.player;
         if (airJumpCooldown > 0) airJumpCooldown--;
-        if (p.isOnGround()) {
+        if (p.onGround()) {
             wasOnGround = true;
             return;
         }
-        if (p.input.lastInput.jump() && !wasOnGround && airJumpCooldown <= 0) {
+        if (p.input.keyPresses.jump() && !wasOnGround && airJumpCooldown <= 0) {
             Vec3 vel = p.getDeltaMovement();
             p.setDeltaMovement(vel.x, 0.42, vel.z);
             p.fallDistance = 0.0f;
             airJumpCooldown = 10;
         }
-        if (!p.input.lastInput.jump()) wasOnGround = false;
+        if (!p.input.keyPresses.jump()) wasOnGround = false;
     }
 
     private static void tickNoWeb(Minecraft client) {
@@ -327,7 +327,7 @@ public class WurstHandlers {
         float speed = ModConfig.flightPlusSpeed;
         float yaw = (float) Math.toRadians(p.getYRot());
         double motionX = 0, motionY = 0, motionZ = 0;
-        net.minecraft.world.entity.player.Input input = p.input.lastInput;
+        net.minecraft.world.entity.player.Input input = p.input.keyPresses;
         if (input.forward()) {
             motionX -= Math.sin(yaw) * speed * 0.1;
             motionZ += Math.cos(yaw) * speed * 0.1;
@@ -345,7 +345,7 @@ public class WurstHandlers {
             motionZ -= Math.sin(yaw) * speed * 0.1;
         }
         if (input.jump()) motionY = speed * 0.1;
-        if (input.sneak()) motionY = -speed * 0.1;
+        if (input.shift()) motionY = -speed * 0.1;
         if (input.sprint()) {
             motionX *= 2.0;
             motionZ *= 2.0;
@@ -359,7 +359,7 @@ public class WurstHandlers {
         LocalPlayer p = client.player;
         if (longJumpTimer > 0) longJumpTimer--;
         Vec3 vel = p.getDeltaMovement();
-        if (!p.isOnGround() && vel.y > 0.38 && vel.y < 0.45 && longJumpTimer <= 0) {
+        if (!p.onGround() && vel.y > 0.38 && vel.y < 0.45 && longJumpTimer <= 0) {
             float yaw = (float) Math.toRadians(p.getYRot());
             double boost = ModConfig.longJumpBoost * 0.3;
             p.setDeltaMovement(
@@ -377,7 +377,7 @@ public class WurstHandlers {
             autoMLGCooldown--;
             return;
         }
-        if (p.isOnGround() || p.getDeltaMovement().y > -0.5 || p.fallDistance < 5.0f) return;
+        if (p.onGround() || p.getDeltaMovement().y > -0.5 || p.fallDistance < 5.0f) return;
         BlockPos below = p.blockPosition();
         for (int i = 0; i < 5; i++) {
             below = below.below();
@@ -390,12 +390,12 @@ public class WurstHandlers {
                     }
                 }
                 if (waterSlot < 0) return;
-                int prevSlot = p.getInventory().selected;
-                p.getInventory().selected = waterSlot;
+                int prevSlot = p.getInventory().getSelectedSlot();
+                p.getInventory().setSelectedSlot(waterSlot);
                 p.setXRot(90.0f);
                 client.gameMode.useItem(p, InteractionHand.MAIN_HAND);
                 p.swing(InteractionHand.MAIN_HAND);
-                p.getInventory().selected = prevSlot;
+                p.getInventory().setSelectedSlot(prevSlot);
                 autoMLGCooldown = 40;
                 return;
             }
@@ -422,8 +422,8 @@ public class WurstHandlers {
             ModConfig.blinkEnabled = false;
             blinkActive = false;
             blinkStartPos = null;
-            p.displayClientMessage(
-                    Component.literal("\u00a7e[Blink] Auto-released (5s limit)"), true);
+            p.sendOverlayMessage(
+                    Component.literal("\u00a7e[Blink] Auto-released (5s limit)"));
         }
     }
 }

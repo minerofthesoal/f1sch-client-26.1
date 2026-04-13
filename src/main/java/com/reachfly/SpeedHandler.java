@@ -10,7 +10,7 @@ public class SpeedHandler {
         if (!ModConfig.speedEnabled) return;
         if (client.player == null || client.level == null || client.screen != null) return;
         LocalPlayer player = client.player;
-        if (!player.isOnGround()) return;
+        if (!player.onGround()) return;
         Vec3 velocity = player.getDeltaMovement();
         double currentSpeed = Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
         if (currentSpeed < 0.001) return;

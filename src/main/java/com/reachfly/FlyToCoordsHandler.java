@@ -28,11 +28,11 @@ public class FlyToCoordsHandler {
 
         if (!isNavigating) {
             isNavigating = true; lastPos = pos; stuckTicks = 0; tickCounter = 0;
-            player.displayClientMessage(Component.literal("\u00a7b[f1sch] \u00a7eFlying to X:%.0f Y:%.0f Z:%.0f (%.0f blocks away)".formatted(targetX, targetY, targetZ, distance)), true);
+            player.sendOverlayMessage(Component.literal("\u00a7b[f1sch] \u00a7eFlying to X:%.0f Y:%.0f Z:%.0f (%.0f blocks away)".formatted(targetX, targetY, targetZ, distance)));
         }
         if (distance < ARRIVAL_DISTANCE) {
             ModConfig.flyToCoordsEnabled = false; isNavigating = false; player.setDeltaMovement(Vec3.ZERO);
-            player.displayClientMessage(Component.literal("\u00a7b[f1sch] \u00a7aArrived at destination!"), true); ModConfig.save(); return;
+            player.sendOverlayMessage(Component.literal("\u00a7b[f1sch] \u00a7aArrived at destination!")); ModConfig.save(); return;
         }
         if (!player.getAbilities().instabuild) { player.getAbilities().mayfly = true; player.getAbilities().flying = true; player.fallDistance = 0.0f; }
         if (lastPos != null) { double movedDist = pos.distanceTo(lastPos); if (movedDist < 0.5) stuckTicks++; else stuckTicks = 0; }
@@ -42,7 +42,7 @@ public class FlyToCoordsHandler {
             double speed = ModConfig.flyToCoordsSpeed * 0.05 * 20;
             int etaSeconds = (int) (distance / Math.max(speed, 0.1));
             String eta = etaSeconds > 60 ? String.format("%dm %ds", etaSeconds / 60, etaSeconds % 60) : String.format("%ds", etaSeconds);
-            player.displayClientMessage(Component.literal(String.format("\u00a7b[FlyTo] \u00a7f%.0f blocks | ETA: %s | Speed: %.1fx", distance, eta, ModConfig.flyToCoordsSpeed)), true);
+            player.sendOverlayMessage(Component.literal(String.format("\u00a7b[FlyTo] \u00a7f%.0f blocks | ETA: %s | Speed: %.1fx", distance, eta, ModConfig.flyToCoordsSpeed)));
         }
         Vec3 direction = target.subtract(pos).normalize();
         float baseSpeed = 0.05f * ModConfig.flyToCoordsSpeed;

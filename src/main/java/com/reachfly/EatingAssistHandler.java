@@ -22,11 +22,11 @@ public class EatingAssistHandler {
         if (foodLevel >= ModConfig.eatingHungerThreshold) { if (previousSlot >= 0 || isHoldingUse) reset(client); return; }
         if (player.isUsingItem()) { KeyMapping.set(client.options.keyUse.getDefaultKey(), true); isHoldingUse = true; eatTicks++; if (eatTicks > 80) reset(client); return; }
         if (isHoldingUse) { KeyMapping.set(client.options.keyUse.getDefaultKey(), false); isHoldingUse = false; eatTicks = 0; if (player.getFoodData().getFoodLevel() >= ModConfig.eatingHungerThreshold) { reset(client); return; } }
-        if (previousSlot >= 0) { ItemStack held = player.getMainHandItem(); if (!isFood(held)) { player.getInventory().selected = previousSlot; previousSlot = -1; } }
+        if (previousSlot >= 0) { ItemStack held = player.getMainHandItem(); if (!isFood(held)) { player.getInventory().setSelectedSlot(previousSlot); previousSlot = -1; } }
         int foodSlot = findBestFoodSlot(player);
         if (foodSlot == -1) return;
-        if (previousSlot < 0) previousSlot = player.getInventory().selected;
-        player.getInventory().selected = foodSlot;
+        if (previousSlot < 0) previousSlot = player.getInventory().getSelectedSlot();
+        player.getInventory().setSelectedSlot(foodSlot);
         eatTicks = 0;
         client.gameMode.useItem(player, net.minecraft.world.InteractionHand.MAIN_HAND);
         KeyMapping.set(client.options.keyUse.getDefaultKey(), true);
@@ -35,7 +35,7 @@ public class EatingAssistHandler {
 
     private static void reset(Minecraft client) {
         if (isHoldingUse) { KeyMapping.set(client.options.keyUse.getDefaultKey(), false); isHoldingUse = false; }
-        if (previousSlot >= 0 && client.player != null) client.player.getInventory().selected = previousSlot;
+        if (previousSlot >= 0 && client.player != null) client.player.getInventory().setSelectedSlot(previousSlot);
         previousSlot = -1; eatTicks = 0;
     }
 

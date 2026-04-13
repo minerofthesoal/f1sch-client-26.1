@@ -21,10 +21,10 @@ public class FlyHandler {
             if (!player.isSpectator()) {
                 if (wasFlying) {
                     wasFlying = false;
-                    String msg = player.isOnGround()
+                    String msg = player.onGround()
                             ? "\u00a7c[f1sch] \u00a7aFly disabled. Safe on the ground."
                             : "\u00a7c[f1sch] \u00a7eFly disabled! You are falling!";
-                    player.displayClientMessage(net.minecraft.network.chat.Component.literal(msg), true);
+                    player.sendOverlayMessage(net.minecraft.network.chat.Component.literal(msg));
                 }
                 player.getAbilities().mayfly = false;
                 player.getAbilities().flying = false;

@@ -29,18 +29,18 @@ public class WalkToCoordsHandler {
 
         if (!isNavigating) {
             isNavigating = true; lastPos = pos; stuckTicks = 0; detourYawOffset = 0; detourTicks = 0; tickCounter = 0;
-            player.displayClientMessage(Component.literal("\u00a7b[f1sch] \u00a7eWalking to X:%.0f Y:%.0f Z:%.0f (%.0f blocks)".formatted(targetX, targetY, targetZ, horizDist)), true);
+            player.sendOverlayMessage(Component.literal("\u00a7b[f1sch] \u00a7eWalking to X:%.0f Y:%.0f Z:%.0f (%.0f blocks)".formatted(targetX, targetY, targetZ, horizDist)));
         }
         if (horizDist < ARRIVAL_DISTANCE && Math.abs(pos.y - target.y) < 4) {
             ModConfig.walkToCoordsEnabled = false; isNavigating = false; releaseAllKeys(client);
-            player.displayClientMessage(Component.literal("\u00a7b[f1sch] \u00a7aArrived at destination!"), true); ModConfig.save(); return;
+            player.sendOverlayMessage(Component.literal("\u00a7b[f1sch] \u00a7aArrived at destination!")); ModConfig.save(); return;
         }
         tickCounter++;
         if (tickCounter >= 20) {
             tickCounter = 0;
             if (lastPos != null) { double moved = Math.sqrt((pos.x - lastPos.x) * (pos.x - lastPos.x) + (pos.z - lastPos.z) * (pos.z - lastPos.z)); if (moved < 0.5) stuckTicks += 20; else { stuckTicks = Math.max(0, stuckTicks - 10); if (detourTicks > 0 && moved > 1.0) { detourTicks = Math.max(0, detourTicks - 20); if (detourTicks <= 0) detourYawOffset = 0; } } }
             lastPos = pos;
-            player.displayClientMessage(Component.literal(String.format("\u00a7b[WalkTo] \u00a7f%.0f blocks remaining%s", horizDist, stuckTicks > 40 ? " \u00a7e(rerouting...)" : "")), true);
+            player.sendOverlayMessage(Component.literal(String.format("\u00a7b[WalkTo] \u00a7f%.0f blocks remaining%s", horizDist, stuckTicks > 40 ? " \u00a7e(rerouting...)" : "")));
         }
         if (stuckTicks > 40 && detourTicks <= 0) { detourYawOffset = (detourYawOffset == 0) ? 70 : -detourYawOffset; if (Math.abs(detourYawOffset) < 50) detourYawOffset = 70; detourTicks = 60; stuckTicks = 0; }
         if (stuckTicks > 100) { detourYawOffset = 180; detourTicks = 40; stuckTicks = 0; }

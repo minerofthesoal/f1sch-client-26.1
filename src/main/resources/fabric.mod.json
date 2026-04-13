@@ -10,8 +10,7 @@
   "icon": "assets/reachfly/icon.png",
   "environment": "client",
   "entrypoints": {
-    "client": ["com.reachfly.ReachFlyClient"],
-    "modmenu": ["com.reachfly.ModMenuIntegration"]
+    "client": ["com.reachfly.ReachFlyClient"]
   },
   "mixins": ["reachfly.mixins.json"],
   "depends": {

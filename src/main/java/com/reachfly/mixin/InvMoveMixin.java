@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.player.Input;
+import net.minecraft.world.entity.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -39,7 +39,7 @@ public abstract class InvMoveMixin {
         boolean sneak = options.keyShift.isDown();
         boolean sprint = options.keySprint.isDown();
 
-        player.input.lastInput = new Input(
+        player.input.keyPresses = new Input(
                 forward, backward, left, right, jump, sneak, sprint
         );
     }

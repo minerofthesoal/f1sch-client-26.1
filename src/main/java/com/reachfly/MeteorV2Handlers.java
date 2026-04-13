@@ -89,8 +89,8 @@ public class MeteorV2Handlers {
                 center.north().below(), center.south().below(), center.east().below(), center.west().below()
         };
 
-        int prevSlot = p.getInventory().selected;
-        p.getInventory().selected = obsSlot;
+        int prevSlot = p.getInventory().getSelectedSlot();
+        p.getInventory().setSelectedSlot(obsSlot);
 
         for (BlockPos pos : offsets) {
             BlockState state = client.level.getBlockState(pos);
@@ -102,7 +102,7 @@ public class MeteorV2Handlers {
             }
         }
 
-        p.getInventory().selected = prevSlot;
+        p.getInventory().setSelectedSlot(prevSlot);
     }
 
     // --- CrystalAura: auto place/detonate end crystals near enemy players ---
@@ -145,8 +145,8 @@ public class MeteorV2Handlers {
                 enemyPos.east().below(), enemyPos.west().below()
         };
 
-        int prevSlot = p.getInventory().selected;
-        p.getInventory().selected = crystalSlot;
+        int prevSlot = p.getInventory().getSelectedSlot();
+        p.getInventory().setSelectedSlot(crystalSlot);
 
         for (BlockPos pos : placementSpots) {
             BlockState state = client.level.getBlockState(pos);
@@ -161,7 +161,7 @@ public class MeteorV2Handlers {
             }
         }
 
-        p.getInventory().selected = prevSlot;
+        p.getInventory().setSelectedSlot(prevSlot);
     }
 
     // --- AnchorAura: use respawn anchors for PvP ---
@@ -189,27 +189,27 @@ public class MeteorV2Handlers {
         // Place anchor if not already placed
         if (state.getBlock() != Blocks.RESPAWN_ANCHOR) {
             if (!state.isAir()) return;
-            int prevSlot = p.getInventory().selected;
-            p.getInventory().selected = anchorSlot;
+            int prevSlot = p.getInventory().getSelectedSlot();
+            p.getInventory().setSelectedSlot(anchorSlot);
             gm.useItemOn(p, InteractionHand.MAIN_HAND,
                     new BlockHitResult(Vec3.atCenterOf(placePos), Direction.UP, placePos, false));
             p.swing(InteractionHand.MAIN_HAND);
-            p.getInventory().selected = prevSlot;
+            p.getInventory().setSelectedSlot(prevSlot);
             return;
         }
 
         // Charge with glowstone then activate
-        int prevSlot = p.getInventory().selected;
-        p.getInventory().selected = glowstoneSlot;
+        int prevSlot = p.getInventory().getSelectedSlot();
+        p.getInventory().setSelectedSlot(glowstoneSlot);
         gm.useItemOn(p, InteractionHand.MAIN_HAND,
                 new BlockHitResult(Vec3.atCenterOf(placePos), Direction.UP, placePos, false));
 
         // Activate (right-click with empty hand or non-glowstone)
-        p.getInventory().selected = anchorSlot >= 0 ? anchorSlot : 0;
+        p.getInventory().setSelectedSlot(anchorSlot >= 0 ? anchorSlot : 0);
         gm.useItemOn(p, InteractionHand.MAIN_HAND,
                 new BlockHitResult(Vec3.atCenterOf(placePos), Direction.UP, placePos, false));
         p.swing(InteractionHand.MAIN_HAND);
-        p.getInventory().selected = prevSlot;
+        p.getInventory().setSelectedSlot(prevSlot);
     }
 
     // --- HoleFiller: fill 1x1 holes near player with obsidian ---
@@ -241,12 +241,12 @@ public class MeteorV2Handlers {
                         && !client.level.getBlockState(base.west()).isAir();
                 if (!surrounded) continue;
 
-                int prevSlot = p.getInventory().selected;
-                p.getInventory().selected = obsSlot;
+                int prevSlot = p.getInventory().getSelectedSlot();
+                p.getInventory().setSelectedSlot(obsSlot);
                 gm.useItemOn(p, InteractionHand.MAIN_HAND,
                         new BlockHitResult(Vec3.atCenterOf(base), Direction.UP, base, false));
                 p.swing(InteractionHand.MAIN_HAND);
-                p.getInventory().selected = prevSlot;
+                p.getInventory().setSelectedSlot(prevSlot);
                 return; // one per tick
             }
         }
@@ -277,20 +277,20 @@ public class MeteorV2Handlers {
                 aboveHead.north(), aboveHead.south(), aboveHead.east(), aboveHead.west()
         };
 
-        int prevSlot = p.getInventory().selected;
-        p.getInventory().selected = obsSlot;
+        int prevSlot = p.getInventory().getSelectedSlot();
+        p.getInventory().setSelectedSlot(obsSlot);
 
         for (BlockPos pos : trapPositions) {
             if (client.level.getBlockState(pos).isAir()) {
                 gm.useItemOn(p, InteractionHand.MAIN_HAND,
                         new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false));
                 p.swing(InteractionHand.MAIN_HAND);
-                p.getInventory().selected = prevSlot;
+                p.getInventory().setSelectedSlot(prevSlot);
                 return; // one block per tick
             }
         }
 
-        p.getInventory().selected = prevSlot;
+        p.getInventory().setSelectedSlot(prevSlot);
     }
 
     // --- Reversal: counter-attack when hit, boost toward attacker ---

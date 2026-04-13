@@ -6,7 +6,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 public class AutoArmorHandler {
@@ -36,7 +36,7 @@ public class AutoArmorHandler {
                 }
             }
             if (bestInvSlot >= 0) {
-                client.gameMode.handleInventoryMouseClick(player.containerMenu.containerId, bestInvSlot, 0, ClickType.QUICK_MOVE, player);
+                client.gameMode.handleInventoryMouseClick(player.containerMenu.containerId, bestInvSlot, 0, ContainerInput.QUICK_MOVE, player);
                 return;
             }
         }

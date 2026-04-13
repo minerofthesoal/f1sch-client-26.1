@@ -14,7 +14,7 @@ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.BlockHitResult;
@@ -66,7 +66,7 @@ public class ProHandlers {
         antiAfkTimer++;
         if (antiAfkTimer >= ModConfig.antiAfkInterval) {
             antiAfkTimer = 0; LocalPlayer p = client.player;
-            if (p != null) { p.setYRot(p.getYRot() + (float)(Math.random() * 10 - 5)); if (p.isOnGround()) p.jumpFromGround(); }
+            if (p != null) { p.setYRot(p.getYRot() + (float)(Math.random() * 10 - 5)); if (p.onGround()) p.jumpFromGround(); }
         }
     }
 
@@ -74,7 +74,7 @@ public class ProHandlers {
         if (!ModConfig.fastBreakEnabled || client.gameMode == null) return;
         if (client.gameMode.isDestroying()) {
             int extra = (int)(ModConfig.fastBreakSpeed - 1);
-            for (int i = 0; i < extra; i++) { if (client.hitResult instanceof BlockHitResult bhr) client.gameMode.continueDestroyBlock(bhr.blockPosition(), bhr.getSide()); }
+            for (int i = 0; i < extra; i++) { if (client.hitResult instanceof BlockHitResult bhr) client.gameMode.continueDestroyBlock(bhr.getBlockPos(), bhr.getDirection()); }
         }
     }
 
@@ -95,14 +95,14 @@ public class ProHandlers {
         int radius = 4; BlockPos playerPos = client.player.blockPosition();
         for (int x = -radius; x <= radius; x++) for (int z = -radius; z <= radius; z++) for (int y = -1; y <= 1; y++) {
             BlockPos pos = playerPos.offset(x, y, z); BlockState state = client.level.getBlockState(pos); Block block = state.getBlock();
-            if (block instanceof CropBlock crop && crop.isMature(state)) { client.gameMode.startDestroyBlock(pos, Direction.UP); return; }
+            if (block instanceof CropBlock crop && crop.isMaxAge(state)) { client.gameMode.startDestroyBlock(pos, Direction.UP); return; }
         }
     }
 
     private static void tickPhase(Minecraft client) {
         if (!ModConfig.phaseEnabled || client.player == null) return;
         client.player.noPhysics = true;
-        if (client.player.getY() < client.level.getMinBuildHeight()) client.player.setPosition(client.player.getX(), client.level.getMinBuildHeight() + 1, client.player.getZ());
+        if (client.player.getY() < client.level.getMinY()) client.player.setPos(client.player.getX(), client.level.getMinY() + 1, client.player.getZ());
     }
 
     private static void tickTimer(Minecraft client) {
@@ -110,8 +110,8 @@ public class ProHandlers {
         int extraTicks = (int)(ModConfig.timerSpeed - 1); if (extraTicks < 1) return;
         LocalPlayer p = client.player;
         for (int i = 0; i < extraTicks; i++) {
-            Vec3 vel = p.getDeltaMovement(); p.setPosition(p.getX() + vel.x, p.getY() + vel.y, p.getZ() + vel.z);
-            if (client.getConnection() != null) client.getConnection().send(new ServerboundMovePlayerPacket.Full(p.getX(), p.getY(), p.getZ(), p.getYRot(), p.getXRot(), p.isOnGround(), false));
+            Vec3 vel = p.getDeltaMovement(); p.setPos(p.getX() + vel.x, p.getY() + vel.y, p.getZ() + vel.z);
+            if (client.getConnection() != null) client.getConnection().send(new ServerboundMovePlayerPacket.PosRot(p.getX(), p.getY(), p.getZ(), p.getYRot(), p.getXRot(), p.onGround(), false, false));
         }
     }
 
@@ -136,19 +136,19 @@ public class ProHandlers {
         int containerSlots = container.getRowCount() * 9;
         for (int i = 0; i < containerSlots; i++) {
             Slot slot = container.getSlot(i);
-            if (slot.hasItem()) { client.gameMode.handleInventoryMouseClick(container.containerId, i, 0, ClickType.QUICK_MOVE, client.player); return; }
+            if (slot.hasItem()) { client.gameMode.handleInventoryMouseClick(container.containerId, i, 0, ContainerInput.QUICK_MOVE, client.player); return; }
         }
     }
 
     private static void tickAutoTool(Minecraft client) {
         if (!ModConfig.autoToolEnabled || client.player == null || client.screen != null) return;
         if (!(client.hitResult instanceof BlockHitResult bhr)) return;
-        BlockState state = client.level.getBlockState(bhr.blockPosition());
+        BlockState state = client.level.getBlockState(bhr.getBlockPos());
         if (state.isAir()) return;
         Inventory inv = client.player.getInventory();
         int bestSlot = -1; float bestSpeed = 1.0f;
         for (int i = 0; i < 9; i++) { float speed = inv.getItem(i).getDestroySpeed(state); if (speed > bestSpeed) { bestSpeed = speed; bestSlot = i; } }
-        if (bestSlot >= 0 && bestSlot != inv.selected) inv.selected = bestSlot;
+        if (bestSlot >= 0 && bestSlot != inv.getSelectedSlot()) inv.setSelectedSlot(bestSlot);
     }
 
     private static void tickChatSpam(Minecraft client) {
@@ -169,20 +169,20 @@ public class ProHandlers {
         BlockPos below = p.blockPosition().below();
         if (!client.level.getBlockState(below).isAir()) return;
         int blockSlot = findBlockInHotbar(p); if (blockSlot < 0) return;
-        int prevSlot = p.getInventory().selected; p.getInventory().selected = blockSlot;
+        int prevSlot = p.getInventory().getSelectedSlot(); p.getInventory().setSelectedSlot(blockSlot);
         client.gameMode.useItemOn(p, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(below), Direction.UP, below, false));
-        p.getInventory().selected = prevSlot;
+        p.getInventory().setSelectedSlot(prevSlot);
     }
 
     private static void tickTower(Minecraft client) {
         if (!ModConfig.towerEnabled || client.player == null || client.gameMode == null || client.screen != null) return;
-        LocalPlayer p = client.player; if (!client.options.keyJump.isDown() || !p.isOnGround()) return;
+        LocalPlayer p = client.player; if (!client.options.keyJump.isDown() || !p.onGround()) return;
         BlockPos below = p.blockPosition().below();
         if (client.level.getBlockState(below).isAir()) {
             int blockSlot = findBlockInHotbar(p); if (blockSlot >= 0) {
-                int prevSlot = p.getInventory().selected; p.getInventory().selected = blockSlot;
+                int prevSlot = p.getInventory().getSelectedSlot(); p.getInventory().setSelectedSlot(blockSlot);
                 client.gameMode.useItemOn(p, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(below), Direction.UP, below, false));
-                p.getInventory().selected = prevSlot;
+                p.getInventory().setSelectedSlot(prevSlot);
             }
         }
         p.jumpFromGround();
