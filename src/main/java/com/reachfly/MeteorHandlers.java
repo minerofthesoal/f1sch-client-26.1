@@ -24,7 +24,7 @@ public class MeteorHandlers {
         if (p.getHealth() <= ModConfig.autoLogHealth) {
             ModConfig.autoLogEnabled = false; ModConfig.save();
             p.sendSystemMessage(Component.literal("\u00a7c[f1sch] Auto Log: disconnecting at " + String.format("%.1f HP", p.getHealth())));
-            client.disconnect(); // auto-disconnect on low health
+            client.disconnect(null, false); // auto-disconnect on low health
         }
     }
 
