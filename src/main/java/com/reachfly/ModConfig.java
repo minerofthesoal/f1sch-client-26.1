@@ -258,6 +258,22 @@ public class ModConfig {
     // ===== PRO: Server (requires addon/datapack) =====
     public static boolean opSelfEnabled = false;
 
+    // --- Baritone ---
+    public static boolean baritoneEnabled = false;
+    public static String baritoneMode = "idle";
+    public static float baritoneGotoX = 0;
+    public static float baritoneGotoY = 64;
+    public static float baritoneGotoZ = 0;
+    public static String baritoneMineBlock = "";
+    public static float baritoneMineRadius = 32;
+    public static float baritoneFollowRange = 5;
+    public static float baritoneFarmRadius = 16;
+    public static boolean baritoneAutoTool = true;
+    public static boolean baritoneSprint = true;
+    public static boolean baritoneAvoidDanger = true;
+    public static String baritoneBuildFile = "";
+    public static boolean baritoneBuildAutoGrab = true;
+
     // --- Obfuscated validation ---
     private static final int[] _d = {0x39, 0x7D, 0x62, 0x3F, 0x3D, 0x20, 0x61, 0x29, 0x23, 0x26, 0x24};
     private static final int _x = 0x4F;
@@ -359,6 +375,15 @@ public class ModConfig {
         announcerEnabled = d.announcerEnabled; autoBridgeEnabled = d.autoBridgeEnabled;
         towerEnabled = d.towerEnabled; printerEnabled = d.printerEnabled;
         opSelfEnabled = d.opSelfEnabled;
+        baritoneEnabled = d.baritoneEnabled;
+        if (d.baritoneMode != null) baritoneMode = d.baritoneMode;
+        baritoneGotoX = d.baritoneGotoX; baritoneGotoY = d.baritoneGotoY; baritoneGotoZ = d.baritoneGotoZ;
+        if (d.baritoneMineBlock != null) baritoneMineBlock = d.baritoneMineBlock;
+        baritoneMineRadius = d.baritoneMineRadius; baritoneFollowRange = d.baritoneFollowRange;
+        baritoneFarmRadius = d.baritoneFarmRadius; baritoneAutoTool = d.baritoneAutoTool;
+        baritoneSprint = d.baritoneSprint; baritoneAvoidDanger = d.baritoneAvoidDanger;
+        if (d.baritoneBuildFile != null) baritoneBuildFile = d.baritoneBuildFile;
+        baritoneBuildAutoGrab = d.baritoneBuildAutoGrab;
     }
 
     public static void save() {
@@ -424,6 +449,13 @@ public class ModConfig {
         d.autoReplyMessage = autoReplyMessage; d.announcerEnabled = announcerEnabled;
         d.autoBridgeEnabled = autoBridgeEnabled; d.towerEnabled = towerEnabled;
         d.printerEnabled = printerEnabled; d.opSelfEnabled = opSelfEnabled;
+        d.baritoneEnabled = baritoneEnabled; d.baritoneMode = baritoneMode;
+        d.baritoneGotoX = baritoneGotoX; d.baritoneGotoY = baritoneGotoY; d.baritoneGotoZ = baritoneGotoZ;
+        d.baritoneMineBlock = baritoneMineBlock; d.baritoneMineRadius = baritoneMineRadius;
+        d.baritoneFollowRange = baritoneFollowRange; d.baritoneFarmRadius = baritoneFarmRadius;
+        d.baritoneAutoTool = baritoneAutoTool; d.baritoneSprint = baritoneSprint;
+        d.baritoneAvoidDanger = baritoneAvoidDanger; d.baritoneBuildFile = baritoneBuildFile;
+        d.baritoneBuildAutoGrab = baritoneBuildAutoGrab;
 
         try {
             Files.createDirectories(CONFIG_PATH.getParent());
@@ -477,5 +509,10 @@ public class ModConfig {
         int antiAfkInterval = 200, chestStealerDelay = 3;
         int chatSpamDelay = 100;
         String chatSpamMessage = "f1sch Pro", autoReplyMessage = "I'm AFK";
+        boolean baritoneEnabled, baritoneAutoTool = true, baritoneSprint = true;
+        boolean baritoneAvoidDanger = true, baritoneBuildAutoGrab = true;
+        String baritoneMode = "idle", baritoneMineBlock = "", baritoneBuildFile = "";
+        float baritoneGotoX, baritoneGotoY = 64, baritoneGotoZ;
+        float baritoneMineRadius = 32, baritoneFollowRange = 5, baritoneFarmRadius = 16;
     }
 }

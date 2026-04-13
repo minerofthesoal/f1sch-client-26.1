@@ -55,6 +55,7 @@ public class EventHandler {
         AutoTotemHandler.tick(client); AutoArmorHandler.tick(client); ScaffoldHandler.tick(client);
         TeleportHandler.tick(client); MeteorHandlers.tick(client); ProHandlers.tick(client);
         FreecamHandler.tick(client); WurstHandlers.tick(client); MeteorV2Handlers.tick(client);
+        BaritoneHandler.tick(client);
         ServerSyncHandler.tick(client);
     }
 }
