@@ -8,7 +8,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -198,8 +198,8 @@ public class ConfigScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        super.render(ctx, mouseX, mouseY, delta);
+    public void extractContent(GuiGraphicsExtractor ctx, int mouseX, int mouseY, boolean focused, float delta) {
+        super.extractContent(ctx, mouseX, mouseY, focused, delta);
         ctx.drawCenteredString(font, title, width / 2, 12, 0xFFFFFF);
     }
 
@@ -262,7 +262,7 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(DrawContext ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void extractContent(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             ctx.drawCenteredString(Minecraft.getInstance().font, title, listWidth / 2, y + 6, 0x55FFFF);
         }
@@ -293,7 +293,7 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(DrawContext ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             ctx.drawString(Minecraft.getInstance().font, label, x, y + 6, 0xFFFFFF);
             button.setY(y);
@@ -328,7 +328,7 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(DrawContext ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             ctx.drawString(Minecraft.getInstance().font, label, x, y + 6, 0xFFFFFF);
             slider.setY(y);
@@ -363,7 +363,7 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(DrawContext ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             ctx.drawString(Minecraft.getInstance().font, label, x, y + 6, 0xFFFFFF);
             slider.setY(y);
@@ -389,7 +389,7 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(DrawContext ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             ctx.drawString(Minecraft.getInstance().font, label, x, y + 6, 0xFFFFFF);
             editBox.setY(y);
@@ -426,7 +426,7 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(DrawContext ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             ctx.drawString(Minecraft.getInstance().font, prefix + " X/Y/Z:", x, y + 6, 0xFFFFFF);
             int startX = x + entryWidth - 154;
@@ -467,7 +467,7 @@ public class ConfigScreen extends Screen {
         }
 
         @Override
-        public void render(DrawContext ctx, int index, int y, int x, int entryWidth, int entryHeight,
+        public void render(GuiGraphicsExtractor ctx, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float delta) {
             String label = ModConfig.proUnlocked ? "Pro: Active" : "Enter Pro Code:";
             ctx.drawString(Minecraft.getInstance().font, label, x, y + 6, ModConfig.proUnlocked ? 0x55FF55 : 0xFFAA00);
