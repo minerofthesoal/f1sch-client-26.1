@@ -294,20 +294,22 @@ public class ConfigScreen extends Screen {
             boolean on = mod.enabled.get();
             boolean expanded = mod.name.equals(expandedModule) && !mod.settings.isEmpty();
 
-            // Module toggle button
+            // Module toggle button + optional expand arrow
             String mLabel = (on ? "\u00a7a" : "\u00a7c") + mod.name + (on ? " \u00a72ON" : " \u00a78OFF");
-            if (!mod.settings.isEmpty()) mLabel += expanded ? " \u00a78\u25BC" : " \u00a78\u25B6";
             final Module fMod = mod;
+            int toggleW = mod.settings.isEmpty() ? colW : colW - 20;
             addRenderableWidget(Button.builder(Component.literal(mLabel), b -> {
-                if (!fMod.settings.isEmpty() && expandedModule != null && expandedModule.equals(fMod.name)) {
-                    // Click expanded module = collapse
-                    expandedModule = null; buildPage();
-                } else if (!fMod.settings.isEmpty()) {
-                    expandedModule = fMod.name; buildPage();
-                } else {
-                    fMod.setter.accept(!fMod.enabled.get()); ModConfig.save(); buildPage();
-                }
-            }).bounds(x, y, colW, 18).build());
+                fMod.setter.accept(!fMod.enabled.get()); ModConfig.save(); buildPage();
+            }).bounds(x, y, toggleW, 18).build());
+
+            // Expand/collapse arrow button (only for modules with settings)
+            if (!mod.settings.isEmpty()) {
+                String arrow = expanded ? "\u00a7e\u25BC" : "\u00a78\u25B6";
+                addRenderableWidget(Button.builder(Component.literal(arrow), b -> {
+                    expandedModule = (expandedModule != null && expandedModule.equals(fMod.name)) ? null : fMod.name;
+                    buildPage();
+                }).bounds(x + toggleW, y, 20, 18).build());
+            }
             y += 19;
 
             // Sub-settings when expanded
