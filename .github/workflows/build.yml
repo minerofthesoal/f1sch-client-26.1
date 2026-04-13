@@ -74,10 +74,13 @@ jobs:
 
   release:
     name: Create Release
-    needs: [build-client]
+    needs: [build-client, build-server-addon]
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download client mod artifact
         uses: actions/download-artifact@v4
         with:
@@ -98,17 +101,27 @@ jobs:
           name: f1sch-server-addon-v3-datapack
           path: artifacts/datapack
 
+      - name: List artifacts
+        run: find artifacts -type f | sort
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v3.0.0-build.${{ github.run_number }}
           name: "f1sch v3.0.0 for MC 26.1 (Build #${{ github.run_number }})"
+          make_latest: true
           body: |
-            ## Downloads
-            - **Client Mod (MC 26.1/26.1.1)** - Install in `.minecraft/mods/` (requires Fabric)
+            ## f1sch Client v3.0.0 for Minecraft 26.1
+
+            ### Downloads
+            - **Client Mod** - Install in `.minecraft/mods/` (requires Fabric Loader 0.19+)
             - **Server Addon (Fabric Mod)** - Install in server `mods/` folder
-            - **Server Addon (Data Pack)** - Install in `world/datapacks/` folder (works on ANY server)
+            - **Server Addon (Data Pack)** - Install in `world/datapacks/` folder
+
+            ### Features
+            25+ client-side modules including Reach, Fly, ESP, KillAura, Speed, NoFall,
+            X-Ray, Knockback, Scaffold, AutoTotem, and more. Pro features with code unlock.
           files: |
             artifacts/**/*.jar
             artifacts/**/*.zip
-          generate_release_notes: true
+          generate_release_notes: false
