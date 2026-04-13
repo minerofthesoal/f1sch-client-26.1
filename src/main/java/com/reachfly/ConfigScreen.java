@@ -252,7 +252,7 @@ public class ConfigScreen extends Screen {
         if (showCodeEntry) {
             codeField = new EditBox(font, cx - 80, height / 2 - 20, 160, 18, Component.literal("Code"));
             codeField.setMaxLength(20);
-            addWidget(codeField);
+            addRenderableWidget(codeField);
             addRenderableWidget(Button.builder(Component.literal("\u00a7aActivate"), b -> {
                 if (codeField != null && ModConfig.validateCode(codeField.getValue())) {
                     ModConfig.proUnlocked = true; ModConfig.save();
@@ -271,7 +271,7 @@ public class ConfigScreen extends Screen {
         if (editField != null) {
             editField = new EditBox(font, cx - 80, height / 2 - 20, 160, 18, Component.literal(editLabel));
             editField.setMaxLength(15);
-            addWidget(editField);
+            addRenderableWidget(editField);
             addRenderableWidget(Button.builder(Component.literal("\u00a7aConfirm"), b -> confirmEdit())
                 .bounds(cx - 80, height / 2 + 4, 75, 18).build());
             addRenderableWidget(Button.builder(Component.literal("\u00a7cCancel"), b -> { editField = null; editSetter = null; buildPage(); })
