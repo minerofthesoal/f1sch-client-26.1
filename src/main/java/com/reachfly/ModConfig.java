@@ -266,8 +266,14 @@ public class ModConfig {
     public static float baritoneGotoZ = 0;
     public static String baritoneMineBlock = "";
     public static float baritoneMineRadius = 32;
+    public static final float BARITONE_MINE_RADIUS_MIN = 4.0f;
+    public static final float BARITONE_MINE_RADIUS_MAX = 128.0f;
     public static float baritoneFollowRange = 5;
+    public static final float BARITONE_FOLLOW_MIN = 1.0f;
+    public static final float BARITONE_FOLLOW_MAX = 32.0f;
     public static float baritoneFarmRadius = 16;
+    public static final float BARITONE_FARM_RADIUS_MIN = 4.0f;
+    public static final float BARITONE_FARM_RADIUS_MAX = 64.0f;
     public static boolean baritoneAutoTool = true;
     public static boolean baritoneSprint = true;
     public static boolean baritoneAvoidDanger = true;
