@@ -1,12 +1,13 @@
 package com.reachfly;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
 import com.mojang.blaze3d.platform.InputConstants;
 import org.lwjgl.glfw.GLFW;
 
 public class KeybindHandler {
 
-    private static final KeyMapping.Category CATEGORY = new KeyMapping.Category("key.categories.reachfly");
+    private static final KeyMapping.Category CATEGORY = new KeyMapping.Category(Identifier.fromNamespaceAndPath("reachfly", "category"));
 
     public static KeyMapping toggleReach, toggleFly, toggleEsp, toggleAutoHit;
     public static KeyMapping toggleLowHealthKill, toggleEatingAssist, toggleAutoKillWhenLow;

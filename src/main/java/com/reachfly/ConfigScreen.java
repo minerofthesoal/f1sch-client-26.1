@@ -235,7 +235,6 @@ public class ConfigScreen extends Screen {
         @Override
         public int getRowWidth() { return Math.min(400, width - 40); }
 
-        @Override
         protected int getScrollbarPosition() { return width / 2 + 210; }
     }
 
