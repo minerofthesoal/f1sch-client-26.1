@@ -64,8 +64,9 @@ public class WurstHandlers {
         LocalPlayer p = client.player;
         if (p == null || !p.onGround()) return;
         if (p.getAttackStrengthScale(0.0f) >= 0.95f && !criticalJumped) {
-            p.setDeltaMovement(p.getDeltaMovement().add(0, 0.1, 0));
-            p.setOnGround(false);
+            // Mini-jump high enough for critical hit detection (must be falling when hitting)
+            p.setDeltaMovement(p.getDeltaMovement().add(0, 0.25, 0));
+            p.hurtMarked = true;
             criticalJumped = true;
         }
         if (p.getAttackStrengthScale(0.0f) < 0.5f) criticalJumped = false;
