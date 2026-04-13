@@ -45,7 +45,7 @@ public class ConfigScreen extends Screen {
     protected void init() {
         categories.clear();
         buildCategories();
-        rebuildWidgets();
+        buildPage();
     }
 
     private void buildCategories() {
@@ -222,7 +222,7 @@ public class ConfigScreen extends Screen {
         }
     }
 
-    private void rebuildWidgets() {
+    private void buildPage() {
         clearWidgets();
         int cx = width / 2;
         int sideW = 82;
@@ -236,7 +236,7 @@ public class ConfigScreen extends Screen {
             boolean active = cat.equals(activeCategory);
             String label = (active ? "\u00a7a> " : "\u00a77  ") + clean;
             addRenderableWidget(Button.builder(Component.literal(label), b -> {
-                activeCategory = cat; expandedModule = null; scrollOffset = 0; rebuildWidgets();
+                activeCategory = cat; expandedModule = null; scrollOffset = 0; buildPage();
             }).bounds(panelL, catY, sideW, 14).build());
             catY += 15;
         }
@@ -244,7 +244,7 @@ public class ConfigScreen extends Screen {
         // Pro code button
         if (!ModConfig.proUnlocked) {
             addRenderableWidget(Button.builder(Component.literal("\u00a76\u2605 PRO"), b -> {
-                showCodeEntry = true; rebuildWidgets();
+                showCodeEntry = true; buildPage();
             }).bounds(panelL, catY + 4, sideW, 14).build());
         }
 
@@ -260,7 +260,7 @@ public class ConfigScreen extends Screen {
                 }
             }).bounds(cx - 80, height / 2 + 4, 75, 18).build());
             addRenderableWidget(Button.builder(Component.literal("\u00a7cCancel"), b -> {
-                showCodeEntry = false; codeField = null; rebuildWidgets();
+                showCodeEntry = false; codeField = null; buildPage();
             }).bounds(cx + 5, height / 2 + 4, 75, 18).build());
             addRenderableWidget(Button.builder(Component.literal("Done"), b -> onClose())
                 .bounds(cx - 50, height - 28, 100, 20).build());
@@ -274,7 +274,7 @@ public class ConfigScreen extends Screen {
             addWidget(editField);
             addRenderableWidget(Button.builder(Component.literal("\u00a7aConfirm"), b -> confirmEdit())
                 .bounds(cx - 80, height / 2 + 4, 75, 18).build());
-            addRenderableWidget(Button.builder(Component.literal("\u00a7cCancel"), b -> { editField = null; editSetter = null; rebuildWidgets(); })
+            addRenderableWidget(Button.builder(Component.literal("\u00a7cCancel"), b -> { editField = null; editSetter = null; buildPage(); })
                 .bounds(cx + 5, height / 2 + 4, 75, 18).build());
             return;
         }
@@ -301,11 +301,11 @@ public class ConfigScreen extends Screen {
             addRenderableWidget(Button.builder(Component.literal(mLabel), b -> {
                 if (!fMod.settings.isEmpty() && expandedModule != null && expandedModule.equals(fMod.name)) {
                     // Click expanded module = collapse
-                    expandedModule = null; rebuildWidgets();
+                    expandedModule = null; buildPage();
                 } else if (!fMod.settings.isEmpty()) {
-                    expandedModule = fMod.name; rebuildWidgets();
+                    expandedModule = fMod.name; buildPage();
                 } else {
-                    fMod.setter.accept(!fMod.enabled.get()); ModConfig.save(); rebuildWidgets();
+                    fMod.setter.accept(!fMod.enabled.get()); ModConfig.save(); buildPage();
                 }
             }).bounds(x, y, colW, 18).build());
             y += 19;
@@ -316,7 +316,7 @@ public class ConfigScreen extends Screen {
                     if (s.isToggle) {
                         boolean sOn = s.boolGetter.get();
                         addRenderableWidget(Button.builder(Component.literal("  " + s.name + ": " + (sOn ? "\u00a7aON" : "\u00a7cOFF")), b -> {
-                            s.boolSetter.accept(!s.boolGetter.get()); ModConfig.save(); rebuildWidgets();
+                            s.boolSetter.accept(!s.boolGetter.get()); ModConfig.save(); buildPage();
                         }).bounds(x + 8, y, colW - 8, 14).build());
                     } else {
                         float val = s.floatGetter.get();
@@ -347,7 +347,7 @@ public class ConfigScreen extends Screen {
         editField = new EditBox(font, 0, 0, 160, 18, Component.literal(label));
         String valStr = current == Math.floor(current) ? String.valueOf((int) current) : String.format("%.1f", current);
         editField.setValue(valStr);
-        rebuildWidgets();
+        buildPage();
     }
 
     private void confirmEdit() {
@@ -356,20 +356,20 @@ public class ConfigScreen extends Screen {
             float val = Math.max(editMin, Math.min(editMax, Float.parseFloat(editField.getValue().trim())));
             editSetter.accept(val); ModConfig.save();
         } catch (NumberFormatException ignored) {}
-        editField = null; editSetter = null; rebuildWidgets();
+        editField = null; editSetter = null; buildPage();
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double hAmount, double vAmount) {
         scrollOffset = Math.max(0, scrollOffset - (int)(vAmount * 30));
-        rebuildWidgets();
+        buildPage();
         return true;
     }
 
     @Override
     public void onClose() {
-        if (showCodeEntry) { showCodeEntry = false; codeField = null; rebuildWidgets(); return; }
-        if (editField != null) { editField = null; editSetter = null; rebuildWidgets(); return; }
+        if (showCodeEntry) { showCodeEntry = false; codeField = null; buildPage(); return; }
+        if (editField != null) { editField = null; editSetter = null; buildPage(); return; }
         ModConfig.save();
         minecraft.setScreen(parent);
     }

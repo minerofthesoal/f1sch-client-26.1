@@ -448,4 +448,28 @@ public class BaritoneHandler {
         releaseAllKeys(client);
         reset();
     }
+
+    public static boolean parseCommand(String message) {
+        if (!message.startsWith("#")) return false;
+        String[] parts = message.trim().split("\\s+");
+        String cmd = parts[0].toLowerCase();
+        switch (cmd) {
+            case "#goto" -> { if (parts.length >= 4) { try { ModConfig.baritoneGotoX = Float.parseFloat(parts[1]); ModConfig.baritoneGotoY = Float.parseFloat(parts[2]); ModConfig.baritoneGotoZ = Float.parseFloat(parts[3]); ModConfig.baritoneMode = "goto"; ModConfig.baritoneEnabled = true; ModConfig.save(); } catch (NumberFormatException ignored) {} } return true; }
+            case "#mine" -> { if (parts.length >= 2) { ModConfig.baritoneMineBlock = parts[1]; ModConfig.baritoneMode = "mine"; ModConfig.baritoneEnabled = true; ModConfig.save(); } return true; }
+            case "#follow" -> { ModConfig.baritoneMode = "follow"; ModConfig.baritoneEnabled = true; ModConfig.save(); return true; }
+            case "#farm" -> { ModConfig.baritoneMode = "farm"; ModConfig.baritoneEnabled = true; ModConfig.save(); return true; }
+            case "#explore" -> { ModConfig.baritoneMode = "explore"; ModConfig.baritoneEnabled = true; ModConfig.save(); return true; }
+            case "#build" -> { ModConfig.baritoneMode = "build"; ModConfig.baritoneEnabled = true; ModConfig.save(); return true; }
+            case "#stop" -> { stop(); return true; }
+            default -> { return false; }
+        }
+    }
+
+    public static void stop() {
+        ModConfig.baritoneMode = "idle";
+        reset();
+        Minecraft client = Minecraft.getInstance();
+        releaseAllKeys(client);
+        ModConfig.save();
+    }
 }
