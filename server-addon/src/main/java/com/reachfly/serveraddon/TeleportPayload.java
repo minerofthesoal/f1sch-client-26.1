@@ -13,7 +13,7 @@ public record TeleportPayload(double x, double y, double z) implements CustomPac
     public static final StreamCodec<RegistryFriendlyByteBuf, TeleportPayload> CODEC =
             StreamCodec.of(TeleportPayload::write, TeleportPayload::read);
 
-    private void write(RegistryFriendlyByteBuf buf) { buf.writeDouble(x); buf.writeDouble(y); buf.writeDouble(z); }
+    private static void write(RegistryFriendlyByteBuf buf, TeleportPayload p) { buf.writeDouble(p.x()); buf.writeDouble(p.y()); buf.writeDouble(p.z()); }
     private static TeleportPayload read(RegistryFriendlyByteBuf buf) { return new TeleportPayload(buf.readDouble(), buf.readDouble(), buf.readDouble()); }
     @Override public Type<? extends CustomPacketPayload> type() { return ID; }
 }

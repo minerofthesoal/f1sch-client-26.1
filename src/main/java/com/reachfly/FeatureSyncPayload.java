@@ -13,7 +13,7 @@ public record FeatureSyncPayload(String feature, boolean enabled, float value) i
     public static final StreamCodec<RegistryFriendlyByteBuf, FeatureSyncPayload> CODEC =
             StreamCodec.of(FeatureSyncPayload::write, FeatureSyncPayload::read);
 
-    private void write(RegistryFriendlyByteBuf buf) { buf.writeUtf(feature); buf.writeBoolean(enabled); buf.writeFloat(value); }
+    private static void write(RegistryFriendlyByteBuf buf, FeatureSyncPayload p) { buf.writeUtf(p.feature()); buf.writeBoolean(p.enabled()); buf.writeFloat(p.value()); }
 
     private static FeatureSyncPayload read(RegistryFriendlyByteBuf buf) {
         return new FeatureSyncPayload(buf.readUtf(32767), buf.readBoolean(), buf.readFloat());

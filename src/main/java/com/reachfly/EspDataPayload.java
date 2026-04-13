@@ -17,9 +17,9 @@ public record EspDataPayload(List<EntityEntry> entities) implements CustomPacket
 
     public record EntityEntry(int entityId, double x, double y, double z, String type, float health) {}
 
-    private void write(RegistryFriendlyByteBuf buf) {
-        buf.writeVarInt(entities.size());
-        for (EntityEntry e : entities) { buf.writeVarInt(e.entityId()); buf.writeDouble(e.x()); buf.writeDouble(e.y()); buf.writeDouble(e.z()); buf.writeUtf(e.type()); buf.writeFloat(e.health()); }
+    private static void write(RegistryFriendlyByteBuf buf, EspDataPayload p) {
+        buf.writeVarInt(p.entities().size());
+        for (EntityEntry e : p.entities()) { buf.writeVarInt(e.entityId()); buf.writeDouble(e.x()); buf.writeDouble(e.y()); buf.writeDouble(e.z()); buf.writeUtf(e.type()); buf.writeFloat(e.health()); }
     }
 
     private static EspDataPayload read(RegistryFriendlyByteBuf buf) {
