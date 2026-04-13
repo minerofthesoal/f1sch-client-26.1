@@ -46,8 +46,8 @@ public class AutoElytraSwapHandler {
     private static void swapToChestSlot(Minecraft client, LocalPlayer player, int inventorySlot) {
         int screenSlot = inventorySlot < 9 ? inventorySlot + 36 : inventorySlot;
         int syncId = player.containerMenu.containerId;
-        client.gameMode.handleContainerInput(syncId, screenSlot, 0, ContainerInput.SLOT_PICKUP, player);
-        client.gameMode.handleContainerInput(syncId, 6, 0, ContainerInput.SLOT_PICKUP, player);
-        client.gameMode.handleContainerInput(syncId, screenSlot, 0, ContainerInput.SLOT_PICKUP, player);
+        client.gameMode.handleContainerInput(syncId, screenSlot, 0, ContainerInput.PICKUP, player);
+        client.gameMode.handleContainerInput(syncId, 6, 0, ContainerInput.PICKUP, player);
+        client.gameMode.handleContainerInput(syncId, screenSlot, 0, ContainerInput.PICKUP, player);
     }
 }

@@ -6,7 +6,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class KeybindHandler {
 
-    private static final String CATEGORY = "key.categories.reachfly";
+    private static final KeyMapping.Category CATEGORY = new KeyMapping.Category("key.categories.reachfly");
 
     public static KeyMapping toggleReach, toggleFly, toggleEsp, toggleAutoHit;
     public static KeyMapping toggleLowHealthKill, toggleEatingAssist, toggleAutoKillWhenLow;
