@@ -1,13 +1,12 @@
 package com.reachfly;
 
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import com.mojang.blaze3d.platform.InputConstants;
 import org.lwjgl.glfw.GLFW;
 
 public class KeybindHandler {
 
-    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.of("reachfly");
+    private static final String CATEGORY = "key.categories.reachfly";
 
     public static KeyMapping toggleReach, toggleFly, toggleEsp, toggleAutoHit;
     public static KeyMapping toggleLowHealthKill, toggleEatingAssist, toggleAutoKillWhenLow;
@@ -43,7 +42,7 @@ public class KeybindHandler {
     }
 
     private static KeyMapping reg(String id, int key) {
-        return KeyMappingHelper.registerKeyMapping(new KeyMapping(
-                "key.reachfly." + id, InputConstants.Type.KEYSYM, key, CATEGORY));
+        KeyMapping mapping = new KeyMapping("key.reachfly." + id, InputConstants.Type.KEYSYM, key, CATEGORY);
+        return mapping;
     }
 }

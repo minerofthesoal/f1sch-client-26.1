@@ -20,10 +20,10 @@ public class AutoTotemHandler {
         int syncId = player.containerMenu.containerId;
         for (int i = 9; i < 45; i++) {
             if (player.containerMenu.getSlot(i).getItem().is(Items.TOTEM_OF_UNDYING)) {
-                client.gameMode.handleInventoryMouseClick(syncId, i, 0, ContainerInput.PICKUP.id(), player);
-                client.gameMode.handleInventoryMouseClick(syncId, 45, 0, ContainerInput.PICKUP.id(), player);
+                client.gameMode.handleContainerInput(syncId, i, 0, ContainerInput.SLOT_PICKUP, player);
+                client.gameMode.handleContainerInput(syncId, 45, 0, ContainerInput.SLOT_PICKUP, player);
                 if (!player.containerMenu.getCarried().isEmpty()) {
-                    client.gameMode.handleInventoryMouseClick(syncId, i, 0, ContainerInput.PICKUP.id(), player);
+                    client.gameMode.handleContainerInput(syncId, i, 0, ContainerInput.SLOT_PICKUP, player);
                 }
                 return;
             }

@@ -30,7 +30,7 @@ public class HudOverlay {
         // --- Watermark top-left ---
         String watermark = ModConfig.proUnlocked ? "f1sch PRO" : "f1sch v3.0";
         ctx.fill(2, 2, 6 + font.width(watermark), 14, 0x88000000);
-        ctx.drawString(font, watermark, 4, 4, COLOR_WATERMARK, true);
+        ctx.drawString(font, watermark, 4, 4, COLOR_WATERMARK);
 
         // --- Module array list top-right, sorted by text width, right-aligned with color bars ---
         List<String> activeModules = getActiveModules();
@@ -51,7 +51,7 @@ public class HudOverlay {
             ctx.fill(screenWidth - 2, yOffset, screenWidth, yOffset + 11, barColor);
 
             // Module name
-            ctx.drawString(font, name, x, yOffset + 1, barColor, false);
+            ctx.drawString(font, name, x, yOffset + 1, barColor);
             yOffset += 11;
         }
 
@@ -63,16 +63,16 @@ public class HudOverlay {
 
         int infoY = screenHeight - 12;
         ctx.fill(0, infoY - 2, font.width(coords) + 6, screenHeight, 0x88000000);
-        ctx.drawString(font, coords, 4, infoY, COLOR_COORDS, false);
+        ctx.drawString(font, coords, 4, infoY, COLOR_COORDS);
 
         infoY -= 12;
         ctx.fill(0, infoY - 2, font.width(direction) + 6, infoY + 10, 0x88000000);
-        ctx.drawString(font, direction, 4, infoY, COLOR_COORDS, false);
+        ctx.drawString(font, direction, 4, infoY, COLOR_COORDS);
 
         infoY -= 12;
         String fpsLabel = "FPS: " + fps;
         ctx.fill(0, infoY - 2, font.width(fpsLabel) + 6, infoY + 10, 0x88000000);
-        ctx.drawString(font, fpsLabel, 4, infoY, COLOR_FPS, false);
+        ctx.drawString(font, fpsLabel, 4, infoY, COLOR_FPS);
     }
 
     private static List<String> getActiveModules() {

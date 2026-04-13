@@ -136,7 +136,7 @@ public class ProHandlers {
         int containerSlots = container.getRowCount() * 9;
         for (int i = 0; i < containerSlots; i++) {
             Slot slot = container.getSlot(i);
-            if (slot.hasItem()) { client.gameMode.handleInventoryMouseClick(container.containerId, i, 0, ContainerInput.QUICK_MOVE.id(), client.player); return; }
+            if (slot.hasItem()) { client.gameMode.handleContainerInput(container.containerId, i, 0, ContainerInput.SLOT_QUICK_MOVE, client.player); return; }
         }
     }
 

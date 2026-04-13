@@ -42,7 +42,9 @@ public class EspRenderer {
         int centerY = screenHeight / 2;
 
         // Build view-projection matrix
-        Matrix4f projMatrix = client.gameRenderer.getProjectionMatrix(client.options.fov().get().floatValue());
+        float fov = client.options.fov().get().floatValue();
+        float aspectRatio = (float) screenWidth / (float) screenHeight;
+        Matrix4f projMatrix = new Matrix4f().perspective((float) Math.toRadians(fov), aspectRatio, 0.05f, 1000.0f);
         Matrix4f viewMatrix = new Matrix4f();
         viewMatrix.identity();
         viewMatrix.rotate(Axis.XP.rotationDegrees(camera.xRot()));
