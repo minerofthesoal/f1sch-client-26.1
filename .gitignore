@@ -1,0 +1,37 @@
+# gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+.vscode/
+*.launch
+.classpath
+.project
+.settings/
+
+# macos
+.DS_Store
+
+# fabric
+run/
+remappedSrc/
+
+# java
+*.class
+*.log
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# server addon build
+server-addon/.gradle/
+server-addon/build/
+server-addon/run/
+!server-addon/gradle/wrapper/gradle-wrapper.jar
+!server-addon/gradle/wrapper/gradle-wrapper.properties

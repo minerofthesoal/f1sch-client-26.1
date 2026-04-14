@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "reachfly",
+  "version": "${version}",
+  "name": "f1sch client",
+  "description": "The ultimate Minecraft client mod with 25+ features. Built for MC 26.1/26.1.1.",
+  "authors": ["f1schDev"],
+  "contact": {"sources": "https://github.com/minerofthesoal/f1sch-client-26.1"},
+  "license": "Apache-2.0",
+  "icon": "assets/reachfly/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.reachfly.ReachFlyClient"]
+  },
+  "mixins": ["reachfly.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "minecraft": ">=26.1",
+    "java": ">=25",
+    "fabric-api": "*"
+  },
+  "suggests": {"modmenu": "*"}
+}
