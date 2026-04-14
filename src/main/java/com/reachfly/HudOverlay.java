@@ -30,7 +30,7 @@ public class HudOverlay {
         // --- Watermark top-left ---
         String watermark = ModConfig.proUnlocked ? "f1sch PRO" : "f1sch v3.0";
         ctx.fill(2, 2, 6 + font.width(watermark), 14, 0x88000000);
-        ctx.drawTextWithShadow(font, Component.literal(watermark), 4, 4, COLOR_WATERMARK);
+        font.drawInBatch(Component.literal(watermark), 4, 4, COLOR_WATERMARK, true, ctx.pose().last().pose(), ctx.bufferSource(), net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, 15728880);
 
         // --- Module array list top-right ---
         List<String> activeModules = getActiveModules();
@@ -45,7 +45,7 @@ public class HudOverlay {
             ctx.fill(x - 2, yOffset, screenWidth, yOffset + 11, 0x88000000);
             int barColor = lerpColor(BAR_COLOR_START, BAR_COLOR_END, moduleCount > 1 ? (float) i / (moduleCount - 1) : 0f);
             ctx.fill(screenWidth - 2, yOffset, screenWidth, yOffset + 11, barColor);
-            ctx.drawTextWithShadow(font, Component.literal(name), x, yOffset + 1, barColor);
+            font.drawInBatch(Component.literal(name), x, yOffset + 1, barColor, true, ctx.pose().last().pose(), ctx.bufferSource(), net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, 15728880);
             yOffset += 11;
         }
 
@@ -57,16 +57,16 @@ public class HudOverlay {
 
         int infoY = screenHeight - 12;
         ctx.fill(0, infoY - 2, font.width(coords) + 6, screenHeight, 0x88000000);
-        ctx.drawTextWithShadow(font, Component.literal(coords), 4, infoY, COLOR_COORDS);
+        font.drawInBatch(Component.literal(coords), 4, infoY, COLOR_COORDS, true, ctx.pose().last().pose(), ctx.bufferSource(), net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, 15728880);
 
         infoY -= 12;
         ctx.fill(0, infoY - 2, font.width(direction) + 6, infoY + 10, 0x88000000);
-        ctx.drawTextWithShadow(font, Component.literal(direction), 4, infoY, COLOR_COORDS);
+        font.drawInBatch(Component.literal(direction), 4, infoY, COLOR_COORDS, true, ctx.pose().last().pose(), ctx.bufferSource(), net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, 15728880);
 
         infoY -= 12;
         String fpsLabel = "FPS: " + fps;
         ctx.fill(0, infoY - 2, font.width(fpsLabel) + 6, infoY + 10, 0x88000000);
-        ctx.drawTextWithShadow(font, Component.literal(fpsLabel), 4, infoY, COLOR_FPS);
+        font.drawInBatch(Component.literal(fpsLabel), 4, infoY, COLOR_FPS, true, ctx.pose().last().pose(), ctx.bufferSource(), net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, 15728880);
     }
 
     private static List<String> getActiveModules() {
