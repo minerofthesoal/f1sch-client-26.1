@@ -5,7 +5,6 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
@@ -95,10 +94,9 @@ public class MeteorV2Handlers {
         for (BlockPos pos : offsets) {
             BlockState state = client.level.getBlockState(pos);
             if (state.isAir()) {
-                gm.useItemOn(p, InteractionHand.MAIN_HAND,
-                        new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false));
-                p.swing(InteractionHand.MAIN_HAND);
-                break; // one block per tick for legit appearance
+                if (placeBlockAgainstNeighbor(client, gm, p, pos)) {
+                    break; // one block per tick for legit appearance
+                }
             }
         }
 
@@ -142,7 +140,9 @@ public class MeteorV2Handlers {
         BlockPos enemyPos = nearestEnemy.blockPosition();
         BlockPos[] placementSpots = {
                 enemyPos.below(), enemyPos.north().below(), enemyPos.south().below(),
-                enemyPos.east().below(), enemyPos.west().below()
+                enemyPos.east().below(), enemyPos.west().below(),
+                enemyPos, enemyPos.north(), enemyPos.south(),
+                enemyPos.east(), enemyPos.west()
         };
 
         int prevSlot = p.getInventory().getSelectedSlot();
@@ -151,12 +151,22 @@ public class MeteorV2Handlers {
         for (BlockPos pos : placementSpots) {
             BlockState state = client.level.getBlockState(pos);
             if (state.getBlock() == Blocks.OBSIDIAN || state.getBlock() == Blocks.BEDROCK) {
-                BlockState above = client.level.getBlockState(pos.above());
-                if (above.isAir()) {
-                    gm.useItemOn(p, InteractionHand.MAIN_HAND,
-                            new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false));
-                    p.swing(InteractionHand.MAIN_HAND);
-                    break;
+                // Crystal placement: need air above the obsidian/bedrock, and also air 2 above
+                BlockPos above1 = pos.above();
+                BlockPos above2 = pos.above(2);
+                if (client.level.getBlockState(above1).isAir() && client.level.getBlockState(above2).isAir()) {
+                    // Check no entities in the way at placement position
+                    AABB placementBox = new AABB(above1);
+                    List<Entity> blocking = client.level.getEntitiesOfClass(
+                            Entity.class, placementBox);
+                    if (blocking.isEmpty()) {
+                        // Click on top face of the obsidian/bedrock block
+                        Vec3 hitVec = new Vec3(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
+                        gm.useItemOn(p, InteractionHand.MAIN_HAND,
+                                new BlockHitResult(hitVec, Direction.UP, pos, false));
+                        p.swing(InteractionHand.MAIN_HAND);
+                        break;
+                    }
                 }
             }
         }
@@ -191,23 +201,22 @@ public class MeteorV2Handlers {
             if (!state.isAir()) return;
             int prevSlot = p.getInventory().getSelectedSlot();
             p.getInventory().setSelectedSlot(anchorSlot);
-            gm.useItemOn(p, InteractionHand.MAIN_HAND,
-                    new BlockHitResult(Vec3.atCenterOf(placePos), Direction.UP, placePos, false));
-            p.swing(InteractionHand.MAIN_HAND);
+            placeBlockAgainstNeighbor(client, gm, p, placePos);
             p.getInventory().setSelectedSlot(prevSlot);
             return;
         }
 
         // Charge with glowstone then activate
         int prevSlot = p.getInventory().getSelectedSlot();
-        p.getInventory().setSelectedSlot(glowstoneSlot);
-        gm.useItemOn(p, InteractionHand.MAIN_HAND,
-                new BlockHitResult(Vec3.atCenterOf(placePos), Direction.UP, placePos, false));
+        Vec3 hitVec = new Vec3(placePos.getX() + 0.5, placePos.getY() + 1.0, placePos.getZ() + 0.5);
+        BlockHitResult anchorHit = new BlockHitResult(hitVec, Direction.UP, placePos, false);
 
-        // Activate (right-click with empty hand or non-glowstone)
-        p.getInventory().setSelectedSlot(anchorSlot >= 0 ? anchorSlot : 0);
-        gm.useItemOn(p, InteractionHand.MAIN_HAND,
-                new BlockHitResult(Vec3.atCenterOf(placePos), Direction.UP, placePos, false));
+        p.getInventory().setSelectedSlot(glowstoneSlot);
+        gm.useItemOn(p, InteractionHand.MAIN_HAND, anchorHit);
+
+        // Activate (right-click with non-glowstone item to trigger explosion)
+        p.getInventory().setSelectedSlot(anchorSlot);
+        gm.useItemOn(p, InteractionHand.MAIN_HAND, anchorHit);
         p.swing(InteractionHand.MAIN_HAND);
         p.getInventory().setSelectedSlot(prevSlot);
     }
@@ -230,11 +239,13 @@ public class MeteorV2Handlers {
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
                 BlockPos base = playerPos.offset(x, -1, z);
-                // Check if it's a 1x1 hole: solid floor, air at feet, surrounded on 4 sides
+                // Check if it's a 1x1 hole: air at this level, solid floor below,
+                // surrounded on 4 sides by solid blocks
                 if (!client.level.getBlockState(base).isAir()) continue;
                 BlockPos below = base.below();
                 if (client.level.getBlockState(below).isAir()) continue; // not a 1-deep hole
-                // Check 4 surrounding blocks at feet level
+
+                // Check 4 surrounding blocks at this level
                 boolean surrounded = !client.level.getBlockState(base.north()).isAir()
                         && !client.level.getBlockState(base.south()).isAir()
                         && !client.level.getBlockState(base.east()).isAir()
@@ -243,9 +254,8 @@ public class MeteorV2Handlers {
 
                 int prevSlot = p.getInventory().getSelectedSlot();
                 p.getInventory().setSelectedSlot(obsSlot);
-                gm.useItemOn(p, InteractionHand.MAIN_HAND,
-                        new BlockHitResult(Vec3.atCenterOf(base), Direction.UP, base, false));
-                p.swing(InteractionHand.MAIN_HAND);
+                // Place against an adjacent solid block (like ScaffoldHandler does)
+                placeBlockAgainstNeighbor(client, gm, p, base);
                 p.getInventory().setSelectedSlot(prevSlot);
                 return; // one per tick
             }
@@ -282,11 +292,10 @@ public class MeteorV2Handlers {
 
         for (BlockPos pos : trapPositions) {
             if (client.level.getBlockState(pos).isAir()) {
-                gm.useItemOn(p, InteractionHand.MAIN_HAND,
-                        new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false));
-                p.swing(InteractionHand.MAIN_HAND);
-                p.getInventory().setSelectedSlot(prevSlot);
-                return; // one block per tick
+                if (placeBlockAgainstNeighbor(client, gm, p, pos)) {
+                    p.getInventory().setSelectedSlot(prevSlot);
+                    return; // one block per tick
+                }
             }
         }
 
@@ -330,6 +339,32 @@ public class MeteorV2Handlers {
     }
 
     // --- Utility methods ---
+
+    /**
+     * Place a block at the given air position by clicking on an adjacent solid block's face.
+     * This is the correct Minecraft block placement approach: you right-click an existing
+     * block's face, and the new block appears on the clicked side.
+     *
+     * @return true if a placement interaction was sent
+     */
+    private static boolean placeBlockAgainstNeighbor(Minecraft client, MultiPlayerGameMode gm,
+                                                      LocalPlayer p, BlockPos airPos) {
+        Direction[] directions = {Direction.DOWN, Direction.NORTH, Direction.SOUTH,
+                Direction.EAST, Direction.WEST, Direction.UP};
+        for (Direction dir : directions) {
+            BlockPos neighbor = airPos.relative(dir);
+            BlockState neighborState = client.level.getBlockState(neighbor);
+            if (!neighborState.isAir() && !neighborState.liquid()) {
+                // Click on the neighbor block's face that faces toward the air position
+                Vec3 hitVec = Vec3.atCenterOf(neighbor);
+                BlockHitResult hit = new BlockHitResult(hitVec, dir.getOpposite(), neighbor, false);
+                gm.useItemOn(p, InteractionHand.MAIN_HAND, hit);
+                p.swing(InteractionHand.MAIN_HAND);
+                return true;
+            }
+        }
+        return false;
+    }
 
     private static Player findNearestEnemy(Minecraft client, LocalPlayer self, double range) {
         List<Player> players = client.level.getEntitiesOfClass(

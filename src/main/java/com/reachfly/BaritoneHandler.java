@@ -1,7 +1,6 @@
 package com.reachfly;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -325,10 +324,6 @@ public class BaritoneHandler {
         while (yawDiff < -180) yawDiff += 360;
         player.setYRot(player.getYRot() + yawDiff * 0.25f);
 
-        // Press forward
-        KeyMapping.set(client.options.keyUp.getDefaultKey(), true);
-        client.options.keyUp.setDown(true);
-
         // Jump / obstacle detection
         float facingYaw = player.getYRot();
         double faceDx = -Math.sin(Math.toRadians(facingYaw));
@@ -374,13 +369,10 @@ public class BaritoneHandler {
             }
         }
 
-        KeyMapping.set(client.options.keyJump.getDefaultKey(), shouldJump);
-        client.options.keyJump.setDown(shouldJump);
-
-        // Sprint
+        // Set player movement directly instead of using KeyMapping
         boolean canSprint = ModConfig.baritoneSprint && player.getFoodData().getFoodLevel() > 6 && !inLiquid;
-        KeyMapping.set(client.options.keySprint.getDefaultKey(), canSprint);
-        client.options.keySprint.setDown(canSprint);
+        player.input.keyPresses = new net.minecraft.world.entity.player.Input(
+                true, false, false, false, shouldJump, false, canSprint);
     }
 
     // ======================== UTILITY ========================
@@ -425,12 +417,10 @@ public class BaritoneHandler {
     }
 
     private static void releaseAllKeys(Minecraft client) {
-        KeyMapping.set(client.options.keyUp.getDefaultKey(), false);
-        client.options.keyUp.setDown(false);
-        KeyMapping.set(client.options.keyJump.getDefaultKey(), false);
-        client.options.keyJump.setDown(false);
-        KeyMapping.set(client.options.keySprint.getDefaultKey(), false);
-        client.options.keySprint.setDown(false);
+        if (client.player != null) {
+            client.player.input.keyPresses = new net.minecraft.world.entity.player.Input(
+                    false, false, false, false, false, false, false);
+        }
     }
 
     private static void reset() {

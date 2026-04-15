@@ -5,28 +5,21 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Item browser screen with search. Click an item to give it via server addon or datapack trigger.
- * TODO: Rendering stubbed for MC 26.1 GuiGraphicsExtractor API migration.
+ * Paged item browser. Search + click to give items via server addon or datapack trigger.
+ * Includes all potion variants, enchanted books, and tipped arrows.
  */
 public class ItemGiveScreen extends Screen {
 
@@ -34,109 +27,41 @@ public class ItemGiveScreen extends Screen {
     private EditBox searchField;
     private List<ItemEntry> allItems;
     private List<ItemEntry> filteredItems;
-    private double scrollOffset = 0;
+    private int page = 0;
     private String lastQuery = "";
-    private String toastMessage = null;
-    private int toastTimer = 0;
+    private static final int ROWS = 8;
+    private static final int COLS = 2;
+    private static final int PER_PAGE = ROWS * COLS;
 
-    private static final int ITEM_SIZE = 20;
-    private static final int GRID_PAD = 2;
-    private static final int CELL = ITEM_SIZE + GRID_PAD;
-    private static final int SPECIAL_START = 1481;
-
-    private static final String[][] POTION_EFFECTS = {
-        {"awkward", "Awkward"}, {"fire_resistance", "Fire Resistance"}, {"harming", "Harming"},
-        {"healing", "Healing"}, {"infested", "Infested"}, {"invisibility", "Invisibility"},
-        {"leaping", "Leaping"}, {"long_fire_resistance", "Fire Resistance (Long)"},
-        {"long_invisibility", "Invisibility (Long)"}, {"long_leaping", "Leaping (Long)"},
-        {"long_night_vision", "Night Vision (Long)"}, {"long_poison", "Poison (Long)"},
-        {"long_regeneration", "Regeneration (Long)"}, {"long_slow_falling", "Slow Falling (Long)"},
-        {"long_slowness", "Slowness (Long)"}, {"long_strength", "Strength (Long)"},
-        {"long_swiftness", "Swiftness (Long)"}, {"long_turtle_master", "Turtle Master (Long)"},
-        {"long_water_breathing", "Water Breathing (Long)"}, {"long_weakness", "Weakness (Long)"},
-        {"luck", "Luck"}, {"mundane", "Mundane"}, {"night_vision", "Night Vision"},
-        {"oozing", "Oozing"}, {"poison", "Poison"}, {"regeneration", "Regeneration"},
-        {"slow_falling", "Slow Falling"}, {"slowness", "Slowness"}, {"strength", "Strength"},
-        {"strong_harming", "Harming II"}, {"strong_healing", "Healing II"},
-        {"strong_leaping", "Leaping II"}, {"strong_poison", "Poison II"},
-        {"strong_regeneration", "Regeneration II"}, {"strong_slowness", "Slowness IV"},
-        {"strong_strength", "Strength II"}, {"strong_swiftness", "Swiftness II"},
-        {"strong_turtle_master", "Turtle Master II"}, {"swiftness", "Swiftness"},
-        {"thick", "Thick"}, {"turtle_master", "Turtle Master"}, {"water", "Water Bottle"},
-        {"water_breathing", "Water Breathing"}, {"weakness", "Weakness"},
-        {"weaving", "Weaving"}, {"wind_charged", "Wind Charged"},
+    // 47 potion effects (alphabetical) - note: 46 listed, "water" is included
+    private static final String[] POTION_EFFECTS = {
+            "awkward", "fire_resistance", "harming", "healing", "infested",
+            "invisibility", "leaping", "long_fire_resistance", "long_invisibility",
+            "long_leaping", "long_night_vision", "long_poison", "long_regeneration",
+            "long_slow_falling", "long_slowness", "long_strength", "long_swiftness",
+            "long_turtle_master", "long_water_breathing", "long_weakness", "luck",
+            "mundane", "night_vision", "oozing", "poison", "regeneration",
+            "slow_falling", "slowness", "strength", "strong_harming", "strong_healing",
+            "strong_leaping", "strong_poison", "strong_regeneration", "strong_slowness",
+            "strong_strength", "strong_swiftness", "strong_turtle_master", "swiftness",
+            "thick", "turtle_master", "water", "water_breathing", "weakness",
+            "weaving", "wind_charged"
     };
 
-    private static final Object[][] ENCHANTMENTS = {
-        {"aqua_affinity", 1, "Aqua Affinity"}, {"bane_of_arthropods", 5, "Bane of Arthropods V"},
-        {"binding_curse", 1, "Curse of Binding"}, {"blast_protection", 4, "Blast Protection IV"},
-        {"breach", 4, "Breach IV"}, {"channeling", 1, "Channeling"},
-        {"density", 5, "Density V"}, {"depth_strider", 3, "Depth Strider III"},
-        {"efficiency", 5, "Efficiency V"}, {"feather_falling", 4, "Feather Falling IV"},
-        {"fire_aspect", 2, "Fire Aspect II"}, {"fire_protection", 4, "Fire Protection IV"},
-        {"flame", 1, "Flame"}, {"fortune", 3, "Fortune III"},
-        {"frost_walker", 2, "Frost Walker II"}, {"impaling", 5, "Impaling V"},
-        {"infinity", 1, "Infinity"}, {"knockback", 2, "Knockback II"},
-        {"looting", 3, "Looting III"}, {"loyalty", 3, "Loyalty III"},
-        {"luck_of_the_sea", 3, "Luck of the Sea III"}, {"lure", 3, "Lure III"},
-        {"mending", 1, "Mending"}, {"multishot", 1, "Multishot"},
-        {"piercing", 4, "Piercing IV"}, {"power", 5, "Power V"},
-        {"projectile_protection", 4, "Projectile Protection IV"},
-        {"protection", 4, "Protection IV"}, {"punch", 2, "Punch II"},
-        {"quick_charge", 3, "Quick Charge III"}, {"respiration", 3, "Respiration III"},
-        {"riptide", 3, "Riptide III"}, {"sharpness", 5, "Sharpness V"},
-        {"silk_touch", 1, "Silk Touch"}, {"smite", 5, "Smite V"},
-        {"soul_speed", 3, "Soul Speed III"}, {"sweeping_edge", 3, "Sweeping Edge III"},
-        {"swift_sneak", 3, "Swift Sneak III"}, {"thorns", 3, "Thorns III"},
-        {"unbreaking", 3, "Unbreaking III"}, {"vanishing_curse", 1, "Curse of Vanishing"},
-        {"wind_burst", 3, "Wind Burst III"},
+    // 43 enchantments (alphabetical) - note: 42 listed
+    private static final String[] ENCHANTMENTS = {
+            "aqua_affinity", "bane_of_arthropods", "binding_curse", "blast_protection",
+            "breach", "channeling", "density", "depth_strider", "efficiency",
+            "feather_falling", "fire_aspect", "fire_protection", "flame", "fortune",
+            "frost_walker", "impaling", "infinity", "knockback", "looting", "loyalty",
+            "luck_of_the_sea", "lure", "mending", "multishot", "piercing", "power",
+            "projectile_protection", "protection", "punch", "quick_charge", "respiration",
+            "riptide", "sharpness", "silk_touch", "smite", "soul_speed", "sweeping_edge",
+            "swift_sneak", "thorns", "unbreaking", "vanishing_curse", "wind_burst"
     };
 
-    private static Map<String, Integer> triggerCodes = null;
-
-    static Map<String, Integer> getTriggerCodes() {
-        if (triggerCodes == null) {
-            triggerCodes = new HashMap<>();
-            try (InputStream is = ItemGiveScreen.class.getResourceAsStream(
-                    "/data/f1sch/function/features/give_item.mcfunction")) {
-                if (is != null) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        int scoreIdx = line.indexOf("f1sch.give=");
-                        if (scoreIdx < 0) continue;
-                        scoreIdx += "f1sch.give=".length();
-                        int scoreEnd = line.indexOf('}', scoreIdx);
-                        if (scoreEnd < 0) continue;
-                        int itemIdx = line.indexOf("{item:\"");
-                        if (itemIdx < 0) continue;
-                        itemIdx += "{item:\"".length();
-                        int itemEnd = line.indexOf('"', itemIdx);
-                        if (itemEnd < 0) continue;
-                        try {
-                            int code = Integer.parseInt(line.substring(scoreIdx, scoreEnd));
-                            String itemId = line.substring(itemIdx, itemEnd);
-                            triggerCodes.put(itemId, code);
-                        } catch (NumberFormatException ignored) {}
-                    }
-                }
-            } catch (Exception ignored) {}
-
-            if (triggerCodes.isEmpty()) {
-                List<String> ids = new ArrayList<>();
-                for (Item item : BuiltInRegistries.ITEM) {
-                    ItemStack stack = new ItemStack(item);
-                    if (stack.isEmpty()) continue;
-                    ids.add(BuiltInRegistries.ITEM.getKey(item).toString());
-                }
-                Collections.sort(ids);
-                for (int i = 0; i < ids.size(); i++) {
-                    triggerCodes.put(ids.get(i), i + 1);
-                }
-            }
-        }
-        return triggerCodes;
-    }
+    // Potion container types in order
+    private static final String[] POTION_CONTAINERS = {"potion", "splash_potion", "lingering_potion"};
 
     public ItemGiveScreen(Screen parent) {
         super(Component.literal("Item Give"));
@@ -146,107 +71,184 @@ public class ItemGiveScreen extends Screen {
     @Override
     protected void init() {
         allItems = new ArrayList<>();
-        Map<String, Integer> codes = getTriggerCodes();
 
-        List<ItemEntry> regularItems = new ArrayList<>();
+        // Collect all regular items sorted alphabetically by registry ID
+        List<String> sortedItemIds = new ArrayList<>();
         for (Item item : BuiltInRegistries.ITEM) {
             Identifier id = BuiltInRegistries.ITEM.getKey(item);
-            ItemStack stack = new ItemStack(item);
-            if (stack.isEmpty()) continue;
-            String displayName;
-            try { displayName = stack.getHoverName().getString(); } catch (Exception e) { displayName = id.getPath(); }
-            Integer triggerCode = codes.get(id.toString());
-            regularItems.add(new ItemEntry(item, id, displayName, triggerCode != null ? triggerCode : 0, id.getPath()));
+            sortedItemIds.add(id.toString());
         }
-        regularItems.sort((a, b) -> a.id.toString().compareTo(b.id.toString()));
-        allItems.addAll(regularItems);
+        Collections.sort(sortedItemIds);
+        int regularCount = sortedItemIds.size();
 
-        int code = SPECIAL_START;
-        code = addPotionEntries(Items.POTION, "Potion of ", code);
-        code = addPotionEntries(Items.SPLASH_POTION, "Splash P. of ", code);
-        code = addPotionEntries(Items.LINGERING_POTION, "Lingering P. of ", code);
-        code = addPotionEntries(Items.TIPPED_ARROW, "Arrow of ", code);
-        addEnchantedBookEntries(code);
+        // Add regular items with trigger codes (1-based index in sorted order)
+        for (int i = 0; i < sortedItemIds.size(); i++) {
+            String fullId = sortedItemIds.get(i);
+            String namespace;
+            String path;
+            if (fullId.contains(":")) {
+                namespace = fullId.substring(0, fullId.indexOf(':'));
+                path = fullId.substring(fullId.indexOf(':') + 1);
+            } else {
+                namespace = "minecraft";
+                path = fullId;
+            }
+            // Get display name from registry
+            Identifier rid = Identifier.fromNamespaceAndPath(namespace, path);
+            Item item = BuiltInRegistries.ITEM.getValue(rid);
+            String name;
+            try {
+                ItemStack stack = new ItemStack(item);
+                name = stack.isEmpty() ? formatName(path) : stack.getHoverName().getString();
+            } catch (Exception e) {
+                name = formatName(path);
+            }
+            int triggerCode = i + 1;
+            allItems.add(new ItemEntry(fullId, name, triggerCode, false));
+        }
 
-        int panelW = Math.min(400, this.width - 40);
-        int panelX = (this.width - panelW) / 2;
-        searchField = new EditBox(this.font, panelX + 6, 28, panelW - 50, 16, Component.literal("Search"));
-        searchField.setMaxLength(50);
-        searchField.setResponder(q -> { if (!q.equals(lastQuery)) { lastQuery = q; filterItems(); scrollOffset = 0; } });
-        addWidget(searchField);
+        // Special items start after regular items
+        int specialStart = regularCount + 1;
+        int code = specialStart;
 
-        addRenderableWidget(Button.builder(Component.literal("Done"), btn -> onClose())
-                .bounds(width / 2 - 50, height - 28, 100, 20).build());
+        // Potions (normal)
+        for (String effect : POTION_EFFECTS) {
+            String displayName = "Potion of " + formatName(effect);
+            allItems.add(new ItemEntry("minecraft:potion{potion:" + effect + "}", displayName, code++, true));
+        }
+
+        // Splash potions
+        for (String effect : POTION_EFFECTS) {
+            String displayName = "Splash Potion of " + formatName(effect);
+            allItems.add(new ItemEntry("minecraft:splash_potion{potion:" + effect + "}", displayName, code++, true));
+        }
+
+        // Lingering potions
+        for (String effect : POTION_EFFECTS) {
+            String displayName = "Lingering Potion of " + formatName(effect);
+            allItems.add(new ItemEntry("minecraft:lingering_potion{potion:" + effect + "}", displayName, code++, true));
+        }
+
+        // Tipped arrows
+        for (String effect : POTION_EFFECTS) {
+            String displayName = "Tipped Arrow of " + formatName(effect);
+            allItems.add(new ItemEntry("minecraft:tipped_arrow{potion:" + effect + "}", displayName, code++, true));
+        }
+
+        // Enchanted books
+        for (String enchantment : ENCHANTMENTS) {
+            String displayName = "Enchanted Book: " + formatName(enchantment);
+            allItems.add(new ItemEntry("minecraft:enchanted_book{enchantment:" + enchantment + "}", displayName, code++, true));
+        }
 
         filterItems();
+        buildPage();
     }
 
-    private int addPotionEntries(Item containerItem, String prefix, int startCode) {
-        Identifier containerId = BuiltInRegistries.ITEM.getKey(containerItem);
-        for (int i = 0; i < POTION_EFFECTS.length; i++) {
-            allItems.add(new ItemEntry(containerItem, containerId, prefix + POTION_EFFECTS[i][1],
-                    startCode + i, containerId.getPath() + " [" + POTION_EFFECTS[i][0] + "]"));
+    private static String formatName(String path) {
+        StringBuilder sb = new StringBuilder();
+        for (String word : path.split("_")) {
+            if (sb.length() > 0) sb.append(' ');
+            if (!word.isEmpty()) {
+                sb.append(Character.toUpperCase(word.charAt(0)));
+                if (word.length() > 1) sb.append(word.substring(1));
+            }
         }
-        return startCode + POTION_EFFECTS.length;
-    }
-
-    private void addEnchantedBookEntries(int startCode) {
-        Identifier bookId = BuiltInRegistries.ITEM.getKey(Items.ENCHANTED_BOOK);
-        for (int i = 0; i < ENCHANTMENTS.length; i++) {
-            allItems.add(new ItemEntry(Items.ENCHANTED_BOOK, bookId, "Book: " + ENCHANTMENTS[i][2],
-                    startCode + i, "enchanted_book [" + ENCHANTMENTS[i][0] + "]"));
-        }
+        return sb.toString();
     }
 
     private void filterItems() {
-        String query = lastQuery.toLowerCase(Locale.ROOT).trim();
-        if (query.isEmpty()) {
+        String q = lastQuery.toLowerCase(Locale.ROOT).trim();
+        if (q.isEmpty()) {
             filteredItems = new ArrayList<>(allItems);
         } else {
             filteredItems = allItems.stream()
-                    .filter(e -> e.name.toLowerCase(Locale.ROOT).contains(query)
-                            || e.id.getPath().contains(query)
-                            || e.subtitle.toLowerCase(Locale.ROOT).contains(query))
+                    .filter(e -> e.name.toLowerCase(Locale.ROOT).contains(q)
+                            || e.itemId.toLowerCase(Locale.ROOT).contains(q))
                     .collect(Collectors.toList());
         }
     }
 
-    // TODO: render() / extractContent stubbed - GuiGraphicsExtractor rendering API needs porting
+    private void buildPage() {
+        clearWidgets();
+        int cx = width / 2;
+        int colW = 190;
+        int totalPages = Math.max(1, (filteredItems.size() + PER_PAGE - 1) / PER_PAGE);
+        if (page >= totalPages) page = totalPages - 1;
+        if (page < 0) page = 0;
+
+        // Search field
+        searchField = new EditBox(font, cx - 95, 8, 190, 16, Component.literal("Search"));
+        searchField.setMaxLength(40);
+        searchField.setValue(lastQuery);
+        searchField.setResponder(q -> {
+            if (!q.equals(lastQuery)) { lastQuery = q; filterItems(); page = 0; buildPage(); }
+        });
+        addRenderableWidget(searchField);
+
+        // Item buttons in 2 columns
+        int startIdx = page * PER_PAGE;
+        for (int i = 0; i < PER_PAGE && startIdx + i < filteredItems.size(); i++) {
+            int col = i % COLS;
+            int row = i / COLS;
+            int x = cx - colW - 2 + col * (colW + 4);
+            int y = 30 + row * 20;
+            ItemEntry entry = filteredItems.get(startIdx + i);
+            String label = entry.isSpecial ? "\u00a7b" + entry.name : "\u00a7f" + entry.name;
+            addRenderableWidget(Button.builder(
+                    Component.literal(label),
+                    b -> giveItem(entry)
+            ).bounds(x, y, colW, 18).build());
+        }
+
+        // Navigation
+        String pageLabel = "Page " + (page + 1) + "/" + totalPages + " (" + filteredItems.size() + " items)";
+        if (page > 0)
+            addRenderableWidget(Button.builder(Component.literal("<< Prev"), b -> { page--; buildPage(); })
+                    .bounds(cx - 154, height - 28, 70, 20).build());
+        addRenderableWidget(Button.builder(Component.literal(pageLabel), b -> {})
+                .bounds(cx - 60, height - 28, 120, 20).build());
+        if (startIdx + PER_PAGE < filteredItems.size())
+            addRenderableWidget(Button.builder(Component.literal("Next >>"), b -> { page++; buildPage(); })
+                    .bounds(cx + 84, height - 28, 70, 20).build());
+
+        // Back button
+        addRenderableWidget(Button.builder(Component.literal("Back"), b -> onClose())
+                .bounds(cx - 40, height - 52, 80, 20).build());
+    }
+
+    private void giveItem(ItemEntry entry) {
+        Minecraft client = Minecraft.getInstance();
+        if (client == null || client.getConnection() == null) return;
+
+        // Try server addon first
+        if (!entry.isSpecial && ClientPlayNetworking.canSend(ItemGivePayload.ID)) {
+            try {
+                ClientPlayNetworking.send(new ItemGivePayload(entry.itemId, 64));
+                return;
+            } catch (Exception ignored) {}
+        }
+
+        // Use datapack trigger system (works without op)
+        client.getConnection().sendCommand("trigger f1sch.give set " + entry.triggerCode);
+    }
 
     @Override
     public void onClose() {
         if (minecraft != null) minecraft.setScreen(parent);
     }
 
-    public void giveItem(ItemEntry entry) {
-        Minecraft client = Minecraft.getInstance();
-        if (client == null || client.getConnection() == null) return;
-        String itemId = entry.id.toString();
-
-        if (ClientPlayNetworking.canSend(ItemGivePayload.ID)) {
-            try {
-                ClientPlayNetworking.send(new ItemGivePayload(itemId, 64));
-                return;
-            } catch (Exception ignored) {}
-        }
-
-        int code = entry.triggerCode;
-        if (code <= 0) { Integer c = getTriggerCodes().get(itemId); if (c != null) code = c; }
-        if (code > 0 && client.getConnection() != null) {
-            client.getConnection().sendCommand("trigger f1sch.give set " + code);
-        }
-    }
-
     static class ItemEntry {
-        final Item item;
-        final Identifier id;
+        final String itemId;
         final String name;
         final int triggerCode;
-        final String subtitle;
+        final boolean isSpecial;
 
-        ItemEntry(Item item, Identifier id, String name, int triggerCode, String subtitle) {
-            this.item = item; this.id = id; this.name = name;
-            this.triggerCode = triggerCode; this.subtitle = subtitle;
+        ItemEntry(String itemId, String name, int triggerCode, boolean isSpecial) {
+            this.itemId = itemId;
+            this.name = name;
+            this.triggerCode = triggerCode;
+            this.isSpecial = isSpecial;
         }
     }
 }

@@ -26,6 +26,9 @@ public class WurstHandlers {
     private static int longJumpTimer = 0;
     private static boolean wasOnGround = true;
     private static int autoMLGCooldown = 0;
+    private static int autoMLGPrevSlot = -1;
+    private static float autoMLGPrevPitch = 0;
+    private static int autoMLGPickupDelay = 0;
     private static int blinkTickCounter = 0;
     private static Vec3 blinkStartPos = null;
     private static boolean blinkActive = false;
@@ -62,14 +65,18 @@ public class WurstHandlers {
             return;
         }
         LocalPlayer p = client.player;
-        if (p == null || !p.onGround()) return;
-        if (p.getAttackStrengthScale(0.0f) >= 0.95f && !criticalJumped) {
-            // Mini-jump high enough for critical hit detection (must be falling when hitting)
-            p.setDeltaMovement(p.getDeltaMovement().add(0, 0.25, 0));
-            p.hurtMarked = true;
+        if (p == null || !p.onGround() || client.gameMode == null) return;
+        if (p.getAttackStrengthScale(0.0f) < 0.1f && criticalJumped) {
+            // Just attacked - send falling position packets for critical
+            if (client.getConnection() != null) {
+                double x = p.getX(), y = p.getY(), z = p.getZ();
+                client.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + 0.0625, z, p.getYRot(), p.getXRot(), false, false));
+                client.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y, z, p.getYRot(), p.getXRot(), false, false));
+            }
+            criticalJumped = false;
+        } else if (p.getAttackStrengthScale(0.0f) >= 0.9f) {
             criticalJumped = true;
         }
-        if (p.getAttackStrengthScale(0.0f) < 0.5f) criticalJumped = false;
     }
 
     private static void tickBunnyHop(Minecraft client) {
@@ -374,11 +381,42 @@ public class WurstHandlers {
     private static void tickAutoMLG(Minecraft client) {
         if (!ModConfig.autoMLGEnabled || client.player == null || client.gameMode == null) return;
         LocalPlayer p = client.player;
+
+        // Phase 2: After landing, pick up the water with the now-empty bucket
+        if (autoMLGPickupDelay > 0) {
+            autoMLGPickupDelay--;
+            if (autoMLGPickupDelay == 0) {
+                // Find the empty bucket (water bucket becomes bucket after placement)
+                int bucketSlot = -1;
+                for (int slot = 0; slot < 9; slot++) {
+                    if (p.getInventory().getItem(slot).is(Items.BUCKET)) {
+                        bucketSlot = slot;
+                        break;
+                    }
+                }
+                if (bucketSlot >= 0) {
+                    p.getInventory().setSelectedSlot(bucketSlot);
+                    p.setXRot(90.0f);
+                    client.gameMode.useItem(p, InteractionHand.MAIN_HAND);
+                }
+                // Restore original slot and pitch
+                if (autoMLGPrevSlot >= 0) {
+                    p.getInventory().setSelectedSlot(autoMLGPrevSlot);
+                    autoMLGPrevSlot = -1;
+                }
+                p.setXRot(autoMLGPrevPitch);
+            }
+            return;
+        }
+
         if (autoMLGCooldown > 0) {
             autoMLGCooldown--;
             return;
         }
+        // Don't trigger if on ground, moving upward, or not falling far enough
         if (p.onGround() || p.getDeltaMovement().y > -0.5 || p.fallDistance < 5.0f) return;
+
+        // Scan blocks below to see if ground is approaching
         BlockPos below = p.blockPosition();
         for (int i = 0; i < 5; i++) {
             below = below.below();
@@ -391,12 +429,21 @@ public class WurstHandlers {
                     }
                 }
                 if (waterSlot < 0) return;
-                int prevSlot = p.getInventory().getSelectedSlot();
+
+                // Save current state for restoration after landing
+                autoMLGPrevSlot = p.getInventory().getSelectedSlot();
+                autoMLGPrevPitch = p.getXRot();
+
+                // Switch to water bucket and look straight down
                 p.getInventory().setSelectedSlot(waterSlot);
                 p.setXRot(90.0f);
+
+                // Place water - do NOT restore slot yet, server needs to see it
                 client.gameMode.useItem(p, InteractionHand.MAIN_HAND);
                 p.swing(InteractionHand.MAIN_HAND);
-                p.getInventory().setSelectedSlot(prevSlot);
+
+                // Schedule water pickup after landing (about 10 ticks)
+                autoMLGPickupDelay = 10;
                 autoMLGCooldown = 40;
                 return;
             }
