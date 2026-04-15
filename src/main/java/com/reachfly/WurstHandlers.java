@@ -62,14 +62,18 @@ public class WurstHandlers {
             return;
         }
         LocalPlayer p = client.player;
-        if (p == null || !p.onGround()) return;
-        if (p.getAttackStrengthScale(0.0f) >= 0.95f && !criticalJumped) {
-            // Mini-jump high enough for critical hit detection (must be falling when hitting)
-            p.setDeltaMovement(p.getDeltaMovement().add(0, 0.25, 0));
-            p.hurtMarked = true;
+        if (p == null || !p.onGround() || client.gameMode == null) return;
+        if (p.getAttackStrengthScale(0.0f) < 0.1f && criticalJumped) {
+            // Just attacked - send falling position packets for critical
+            if (client.getConnection() != null) {
+                double x = p.getX(), y = p.getY(), z = p.getZ();
+                client.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y + 0.0625, z, p.getYRot(), p.getXRot(), false, false));
+                client.getConnection().send(new ServerboundMovePlayerPacket.PosRot(x, y, z, p.getYRot(), p.getXRot(), false, false));
+            }
+            criticalJumped = false;
+        } else if (p.getAttackStrengthScale(0.0f) >= 0.9f) {
             criticalJumped = true;
         }
-        if (p.getAttackStrengthScale(0.0f) < 0.5f) criticalJumped = false;
     }
 
     private static void tickBunnyHop(Minecraft client) {

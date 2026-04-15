@@ -86,7 +86,8 @@ public class ProHandlers {
         for (int x = -radius; x <= radius; x++) for (int y = -radius; y <= radius; y++) for (int z = -radius; z <= radius; z++) {
             BlockPos pos = playerPos.offset(x, y, z); BlockState state = client.level.getBlockState(pos);
             if (state.isAir() || state.getDestroySpeed(client.level, pos) < 0) continue;
-            client.gameMode.startDestroyBlock(pos, Direction.UP); return;
+            client.gameMode.startDestroyBlock(pos, Direction.UP);
+            client.gameMode.continueDestroyBlock(pos, Direction.UP); return;
         }
     }
 
