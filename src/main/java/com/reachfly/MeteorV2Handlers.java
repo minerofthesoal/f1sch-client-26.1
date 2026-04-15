@@ -5,7 +5,6 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
@@ -158,7 +157,8 @@ public class MeteorV2Handlers {
                 if (client.level.getBlockState(above1).isAir() && client.level.getBlockState(above2).isAir()) {
                     // Check no entities in the way at placement position
                     AABB placementBox = new AABB(above1);
-                    List<Entity> blocking = client.level.getEntities(null, placementBox);
+                    List<Entity> blocking = client.level.getEntitiesOfClass(
+                            Entity.class, placementBox);
                     if (blocking.isEmpty()) {
                         // Click on top face of the obsidian/bedrock block
                         Vec3 hitVec = new Vec3(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);

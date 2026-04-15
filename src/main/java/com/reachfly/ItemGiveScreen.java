@@ -7,7 +7,6 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -85,9 +84,17 @@ public class ItemGiveScreen extends Screen {
         // Add regular items with trigger codes (1-based index in sorted order)
         for (int i = 0; i < sortedItemIds.size(); i++) {
             String fullId = sortedItemIds.get(i);
-            String path = fullId.contains(":") ? fullId.substring(fullId.indexOf(':') + 1) : fullId;
+            String namespace;
+            String path;
+            if (fullId.contains(":")) {
+                namespace = fullId.substring(0, fullId.indexOf(':'));
+                path = fullId.substring(fullId.indexOf(':') + 1);
+            } else {
+                namespace = "minecraft";
+                path = fullId;
+            }
             // Get display name from registry
-            Identifier rid = Identifier.fromNamespaceAndPath("minecraft", path);
+            Identifier rid = Identifier.fromNamespaceAndPath(namespace, path);
             Item item = BuiltInRegistries.ITEM.getValue(rid);
             String name;
             try {
